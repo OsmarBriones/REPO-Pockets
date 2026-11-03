@@ -34,7 +34,7 @@ Steps: host and client in a level; the host grabs a valuable and presses F6; the
 
 Expected: both consoles show `[Spike S3] hide RPC received on host` and `... on client` for the same view id, and the object is hidden on both machines. Showing it again behaves the same way.
 
-Result: **only the singleplayer path was exercised** (RPC methods on the runtime-added component run, `view 0`). The host-and-client case was not tested, so S3 is still open.
+Result so far: in singleplayer the RPC methods on the runtime-added component ran (`view 0`). Later, hosting a multiplayer lobby alone, the `AllBuffered` RPC reached the component through the server with a real view id: `hide RPC received on host for view 92 from borenfenix`. That confirms PUN finds `[PunRPC]` methods on a component added at runtime after `RefreshRpcMonoBehaviourCache`. **Delivery to a remote client is still untested**, so S3 stays open.
 
 ## S4: who simulates a hidden Tiny/Small valuable
 
@@ -57,12 +57,21 @@ Result (2026-11-02): **inconclusive**. No exceptions, but no F7 dump and no `[Sp
 
 Second run (2026-11-02): still **inconclusive**. Every dump reads `inExtractionRoom=False` and `inHaulList=False`, so the valuable was not inside an extraction room (or its room list did not update, which is itself unknown for a hidden object). Next time confirm first, with F7 while the valuable is shown inside the zone, that `inExtractionRoom=True` before hiding it.
 
+Third run (2026-11-02, host of a multiplayer lobby, Desert Golden Coin, Tiny, value 600): **confirmed, and the leak is smaller than feared**.
+- Shown inside the zone: `inHaulList=True inExtractionRoom=True rooms=[Room Volume(extraction), Room Volume (1)] inStartRoom=True`.
+- Hidden: `inHaulList=False rooms=[] inStartRoom=False`. With its colliders disabled the valuable has no room, so vanilla `ValuableObject.Update` itself removes it from the haul list.
+- Shown again in the zone: `inHaulList=True`, `inExtractionRoom=True`, `inStartRoom=True` again, so vanilla adds it back by itself.
+- No exceptions anywhere in the log.
+Consequences: keep the explicit removal on store and the `AddToDollarHaulList` guard as cheap safety for the up to 0.5 s polling window, and refuse to store when `committedToExtraction`; the `inStartRoom` reset on release is harmless but probably unnecessary. A full extraction completing while a valuable is hidden was not run.
+
+Result: S5 **confirmed**.
+
 ## S2: late-join sync
 
 Steps: the host hides a valuable (F6) and presses F8; a third instance joins late and presses F8.
 
 Expected for the buffered-RPC path: the late joiner sees the valuable already hidden. Expected for the property path: the late joiner's F8 list shows the host's `pockets.spike` value. Then the host presses F9 on a client to learn whether the master can write another player's property (`SetCustomProperties returned True` and the value arrives).
 
-Result: **not tested**. F8 was pressed three times while not in a multiplayer room (`[Spike S2] not in a room`), as expected in singleplayer.
+Result so far: in a lobby hosted alone, the local player property was written and read back (`pockets.spike=` after a second press; the first read returned `<none>` because the write is asynchronous). **Late joiner, remote client and master-writes-other-player were not tested.**
 
 Decision: _pending_ (buffered RPC vs player custom properties)
