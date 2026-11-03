@@ -7,7 +7,7 @@ Only the host needs to have this mod installed â€” other players see the ef
 ## Preview
 
 <!-- Visual gameplay demo GIF (auto-configured by RepoKit tools or placed in assets/preview.gif) -->
-![Gameplay Preview](https://raw.githubusercontent.com/OsmarBriones/Pockets/master/assets/preview.gif)
+![Gameplay Preview](https://raw.githubusercontent.com/OsmarBriones/REPO-Pockets/master/assets/preview.gif)
 
 ## How to Use
 
@@ -46,7 +46,7 @@ All settings are controlled through the generated file: `com.osmar.Pockets.cfg` 
 
 ## Issues & Bug Reports
 The official way to report issues, suggest improvements, or submit feedback is by opening an issue on the official GitHub repository:
-ðŸ‘‰ [GitHub Issues](https://github.com/OsmarBriones/Pockets/issues)
+ðŸ‘‰ [GitHub Issues](https://github.com/OsmarBriones/REPO-Pockets/issues)
 
 ## Credits
 Developed by **Osmar Briones**
