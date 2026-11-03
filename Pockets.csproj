@@ -32,6 +32,11 @@
     <EmbeddedResource Remove="external\**" />
     <None Remove="external\**" />
 
+    <!-- The test project lives in a subfolder and must not be compiled into the mod. -->
+    <Compile Remove="Pockets.Tests\**" />
+    <EmbeddedResource Remove="Pockets.Tests\**" />
+    <None Remove="Pockets.Tests\**" />
+
     <!-- When consuming RepoAPI modules (after git submodule add https://github.com/OsmarBriones/RepoAPI.git external/RepoAPI):
     <Compile Include="external\RepoAPI\Items\ItemProvider.cs" />
     <Compile Include="external\RepoAPI\Items\ItemKeysProvider.cs" />
@@ -77,6 +82,22 @@
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>$(RepoManaged)\UnityEngine.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>$(RepoManaged)\Unity.TextMeshPro.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.InputSystem">
+      <HintPath>$(RepoManaged)\Unity.InputSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PhotonRealtime">
+      <HintPath>$(RepoManaged)\PhotonRealtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Photon3Unity3D">
+      <HintPath>$(RepoManaged)\Photon3Unity3D.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>

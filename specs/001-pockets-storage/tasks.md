@@ -17,10 +17,10 @@ description: "Task list for the Pockets storage feature"
 
 **Purpose**: Clean the template and prepare references
 
-- [ ] T001 Remove the template placeholder `Patches/EnemyDirector_Start_Patch.cs` and any reference to it in `PocketsPlugin.cs`
-- [ ] T002 Add the Unity UI, TextMeshPro and Photon assembly references (`Private=false`) to `Pockets.csproj`; keep `Compile Remove="external\**"` and do not include RepoAPI modules
+- [x] T001 Remove the template placeholder `Patches/EnemyDirector_Start_Patch.cs` and any reference to it in `PocketsPlugin.cs`
+- [x] T002 Add the Unity UI, TextMeshPro and Photon assembly references (`Private=false`) to `Pockets.csproj`; keep `Compile Remove="external\**"` and do not include RepoAPI modules
 - [ ] T003 [P] Create the folder skeleton from the plan: `Configuration/`, `Domain/`, `Net/`, `Ui/`, `Api/`, `Patches/`
-- [ ] T004 [P] Create `Pockets.Tests/` (MSTest) following the layout used by the other mods; Tier 1 and Tier 2 live here
+- [x] T004 [P] Create `Pockets.Tests/` (MSTest) following the layout used by the other mods; Tier 1 and Tier 2 live here
 
 ---
 
@@ -28,11 +28,11 @@ description: "Task list for the Pockets storage feature"
 
 **Purpose**: Resolve the five risks in `plan.md` with throwaway prototypes behind an opt-in debug config (disabled by default)
 
-- [ ] T005 S1: prototype hiding a Tiny valuable (shrink, colliders off, `OverrideDeactivate`, release grabbers) and restoring it in front of the camera; log rigidbody, room and haul-list state
-- [ ] T006 S3: prove a runtime-added `MonoBehaviour` with `[PunRPC]` plus `RefreshRpcMonoBehaviourCache` works on a scene-spawned valuable on host and client; if not, switch to `PhotonNetwork.RaiseEvent` with a custom event code
-- [ ] T007 S4: check who simulates a hidden Tiny/Small valuable (`clientNonKinematic`) and that forcing kinematic on store and restoring on release is stable on a client
-- [ ] T008 S5: verify a pocketed valuable inside an extraction room is not added to `RoundDirector.dollarHaulList` and that nothing iterating valuables throws
-- [ ] T009 S2: decide late-join sync (Photon player custom properties vs buffered RPC) and whether the master can write another player's state
+- [ ] T005 S1 (code written in Spikes/, needs the game): prototype hiding a Tiny valuable (shrink, colliders off, `OverrideDeactivate`, release grabbers) and restoring it in front of the camera; log rigidbody, room and haul-list state
+- [ ] T006 S3 (code written in Spikes/, needs host and client): prove a runtime-added `MonoBehaviour` with `[PunRPC]` plus `RefreshRpcMonoBehaviourCache` works on a scene-spawned valuable on host and client; if not, switch to `PhotonNetwork.RaiseEvent` with a custom event code
+- [ ] T007 S4 (code written in Spikes/, needs host and client): check who simulates a hidden Tiny/Small valuable (`clientNonKinematic`) and that forcing kinematic on store and restoring on release is stable on a client
+- [ ] T008 S5 (code written in Spikes/, needs the game): verify a pocketed valuable inside an extraction room is not added to `RoundDirector.dollarHaulList` and that nothing iterating valuables throws
+- [ ] T009 S2 (code written in Spikes/, needs three instances): decide late-join sync (Photon player custom properties vs buffered RPC) and whether the master can write another player's state
 - [ ] T010 Record the outcomes in `specs/001-pockets-storage/research.md` and update `plan.md` where a spike changed the design
 
 ---

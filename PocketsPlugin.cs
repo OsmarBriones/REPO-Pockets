@@ -1,6 +1,6 @@
 using BepInEx;
-using BepInEx.Logging;
 using HarmonyLib;
+using Pockets.Spikes;
 using UnityEngine;
 
 namespace Pockets
@@ -8,8 +8,6 @@ namespace Pockets
 	[BepInPlugin(PluginGuid, PluginName, PluginVersion)]
 	public class PocketsPlugin : BaseUnityPlugin
 	{
-		// Se reemplaza com.osmar por el parámetro AuthorId del template.json
-		// y Pockets por el nombre del proyecto (sourceName).
 		public const string PluginGuid = "com.osmar.Pockets";
 		public const string PluginName = "Pockets";
 		public const string PluginVersion = "1.0.0";
@@ -26,6 +24,12 @@ namespace Pockets
 			this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
 			ConfigurationController.Initialize(this.Config);
+
+			if (ConfigurationController.SpikesEnabled)
+			{
+				this.gameObject.AddComponent<SpikeHotkeys>();
+				Logger.LogWarning("Spike hotkeys are enabled (Debug.EnableSpikes). Developer use only.");
+			}
 
 			Harmony = new Harmony(Info.Metadata.GUID);
 			Harmony.PatchAll();
