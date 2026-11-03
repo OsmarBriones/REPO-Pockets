@@ -134,7 +134,7 @@ Exact signatures are confirmed in Tier 2 reflection tests; if a target changes w
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| Client-side input and UI (Category 2, all players install) | Storing is triggered by each player's own slot key and drawn on their own HUD; those are local by nature. | A host-only mod cannot intercept a client's key press nor draw on its HUD (fails the 4-Question Network Feasibility Gate, questions 1 and 2). |
+| Client-side input and UI (Category 2, all players install) | Storing is triggered by each player's own slot key and drawn on their own HUD; those are local by nature. | A host-only mod cannot intercept a client's key press nor draw on its HUD (fails the 4-Question Network Feasibility Gate, questions 1 and 2). A hybrid was also rejected: a client without the mod would see its slot as empty, could equip items into a slot that holds a pocket (the host can veto the request, but the player gets no feedback), and could not see the stored value or wear. Under the minimum install footprint rule those losses are functional, not cosmetic. |
 
 ## RepoAPI Reuse Decision
 

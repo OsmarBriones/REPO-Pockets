@@ -45,7 +45,7 @@ As a player, I want to configure the largest storable size (default Tiny, up to 
 - **FR-004**: Stored valuables are lost on level change.
 - **FR-005**: On death, stored valuables are dropped where the player fell (`DropOnDeath`, default true).
 - **FR-006**: The mod exposes events for stored and removed valuables for other mods (consumed by TalismanCore).
-- **FR-007**: Multiplayer scope is Category 2: all players install the mod.
+- **FR-007**: Multiplayer scope is Category 2: all players install the mod. A player without it would lose functional things, not cosmetic ones (cannot store or release a valuable, cannot see which slot is occupied, and could try to equip items into a slot that holds a pocket), so the minimum install footprint rule does not allow a lighter scope.
 - **FR-008**: Config file `BepInEx/config/com.osmar.Pockets.cfg` with `Enabled`, `MaxValuableSize`, `DropOnDeath`.
 
 ## Edge Cases
