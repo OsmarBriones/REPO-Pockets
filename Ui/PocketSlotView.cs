@@ -130,6 +130,8 @@ internal sealed class PocketSlotView : MonoBehaviour
 		valueLabel.name = "PocketValue";
 		valueLabel.alignment = TextAlignmentOptions.Center;
 		valueLabel.enableAutoSizing = false;
+		valueLabel.textWrappingMode = TextWrappingModes.NoWrap;
+		valueLabel.overflowMode = TextOverflowModes.Overflow;
 		valueLabel.fontSize = template.fontSize * 0.55f;
 		valueLabel.color = Color.white;
 		valueLabel.raycastTarget = false;
