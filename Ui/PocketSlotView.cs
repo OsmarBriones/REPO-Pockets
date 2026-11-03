@@ -133,11 +133,16 @@ internal sealed class PocketSlotView : MonoBehaviour
 		valueLabel.fontSize = template.fontSize * 0.55f;
 		valueLabel.color = Color.white;
 		valueLabel.raycastTarget = false;
+		valueLabel.outlineWidth = 0.3f;
+		valueLabel.outlineColor = new Color32(0, 0, 0, 255);
 
 		if (spot.inventoryIcon != null)
 		{
+			// Sit inside the lower edge of the picture: the slots are at the very bottom of the screen,
+			// so a label under the icon would be cut off.
 			RectTransform iconRect = spot.inventoryIcon.rectTransform;
-			valueLabel.rectTransform.anchoredPosition = iconRect.anchoredPosition + new Vector2(0f, iconRect.rect.yMin * 0.85f);
+			float inset = valueLabel.fontSize * 0.7f;
+			valueLabel.rectTransform.anchoredPosition = iconRect.anchoredPosition + new Vector2(0f, iconRect.rect.yMin + inset);
 		}
 
 		return valueLabel;

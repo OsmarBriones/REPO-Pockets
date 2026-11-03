@@ -1,24 +1,30 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
 namespace Pockets.Ui;
 
 /// <summary>
-/// Makes the small picture shown on an inventory slot for a pocketed valuable. Valuables have no prebaked
-/// icon (items do), so the picture is rendered once per valuable type from its meshes with a throwaway camera
-/// placed far from the level, and cached. If anything goes wrong a generic gem is used instead.
+/// Provides the small picture shown on an inventory slot for a pocketed valuable. Valuables have no prebaked
+/// icon (items do), so the picture comes from, in order: an icon packaged inside the mod, a picture rendered
+/// at runtime from the valuable's meshes with a throwaway camera and studio lighting, or a generic gem.
+/// Results are cached per valuable type.
 /// </summary>
 internal static class ValuableIconRenderer
 {
-	private const int Size = 128;
+	internal const int Size = 128;
+
 	private const float FieldOfView = 30f;
+	private const string EmbeddedPrefix = "Pockets.Icons.";
 	private static readonly Vector3 FarOrigin = new Vector3(0f, 5000f, 0f);
 	private static readonly Dictionary<string, Sprite> Cache = new Dictionary<string, Sprite>();
 	private static Sprite? fallback;
 
-	/// <summary>The generic icon used when a picture cannot be rendered.</summary>
+	/// <summary>The generic icon used when no picture is available.</summary>
 	internal static Sprite Fallback
 	{
 		get
@@ -32,7 +38,12 @@ internal static class ValuableIconRenderer
 		}
 	}
 
-	/// <summary>Renders and caches the icon of this valuable type if it is not cached yet. Call it before the valuable is hidden.</summary>
+	internal static string KeyOf(GameObject valuable)
+	{
+		return valuable.name.Replace("(Clone)", string.Empty).Trim();
+	}
+
+	/// <summary>Makes sure this valuable type has an icon in the cache. For a runtime render, call it while the valuable is still full size.</summary>
 	internal static void Ensure(GameObject valuable)
 	{
 		string key = KeyOf(valuable);
@@ -41,21 +52,28 @@ internal static class ValuableIconRenderer
 			return;
 		}
 
-		Sprite? sprite = null;
-		try
+		Sprite? sprite = LoadEmbedded(key);
+		string source = "packaged";
+		if (sprite == null)
 		{
-			sprite = Render(valuable);
-		}
-		catch (Exception exception)
-		{
-			PocketsPlugin.Logger.LogWarning($"Could not render an icon for {key}; using the generic one. {exception.Message}");
+			source = "rendered";
+			try
+			{
+				Texture2D? texture = RenderTexture2D(valuable);
+				sprite = texture != null ? Sprite.Create(texture, new Rect(0f, 0f, Size, Size), new Vector2(0.5f, 0.5f)) : null;
+			}
+			catch (Exception exception)
+			{
+				PocketsPlugin.Logger.LogWarning($"Could not render an icon for {key}: {exception.Message}");
+			}
 		}
 
 		if (sprite == null)
 		{
-			PocketsPlugin.Logger.LogInfo($"Using the generic icon for {key}");
+			source = "generic";
 		}
 
+		PocketsPlugin.Logger.LogInfo($"Icon for {key}: {source}");
 		Cache[key] = sprite != null ? sprite : Fallback;
 	}
 
@@ -65,31 +83,106 @@ internal static class ValuableIconRenderer
 		return Cache.TryGetValue(KeyOf(valuable), out Sprite? sprite) && sprite != null ? sprite : Fallback;
 	}
 
-	private static string KeyOf(GameObject valuable)
+	private static Sprite? LoadEmbedded(string key)
 	{
-		return valuable.name.Replace("(Clone)", string.Empty).Trim();
+		try
+		{
+			using Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(EmbeddedPrefix + key + ".png");
+			if (stream == null)
+			{
+				return null;
+			}
+
+			byte[] bytes = new byte[stream.Length];
+			int read = 0;
+			while (read < bytes.Length)
+			{
+				int count = stream.Read(bytes, read, bytes.Length - read);
+				if (count <= 0)
+				{
+					break;
+				}
+
+				read += count;
+			}
+
+			Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+			if (!TryDecodePng(texture, bytes))
+			{
+				Object.Destroy(texture);
+				return null;
+			}
+
+			return Sprite.Create(texture, new Rect(0f, 0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+		}
+		catch (Exception exception)
+		{
+			PocketsPlugin.Logger.LogWarning($"Could not load the packaged icon for {key}: {exception.Message}");
+			return null;
+		}
 	}
 
-	private static Sprite? Render(GameObject valuable)
+	/// <summary>
+	/// Decodes PNG bytes into a texture through <c>ImageConversion.LoadImage(Texture2D, byte[])</c>, called by reflection:
+	/// a direct call makes the compiler look at its <c>ReadOnlySpan</c> overload, which this net48 build cannot reference.
+	/// </summary>
+	private static bool TryDecodePng(Texture2D texture, byte[] bytes)
 	{
-		List<MeshRenderer> renderers = new List<MeshRenderer>();
+		MethodInfo? method = typeof(ImageConversion).GetMethod(
+			"LoadImage", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(Texture2D), typeof(byte[]) }, null);
+		return method != null && method.Invoke(null, new object[] { texture, bytes }) is true;
+	}
+
+	/// <summary>One mesh of a valuable with its transform relative to the valuable's root.</summary>
+	private readonly struct Part
+	{
+		internal Part(Mesh mesh, Material[] materials, Matrix4x4 matrix)
+		{
+			Mesh = mesh;
+			Materials = materials;
+			Matrix = matrix;
+		}
+
+		internal Mesh Mesh { get; }
+
+		internal Material[] Materials { get; }
+
+		internal Matrix4x4 Matrix { get; }
+	}
+
+	/// <summary>
+	/// Renders a valuable (a scene instance or a prefab asset) to a square transparent texture with studio lighting.
+	/// Returns null when there is nothing to draw or the picture came out empty. Also used by the icon baking tool.
+	/// </summary>
+	internal static Texture2D? RenderTexture2D(GameObject source)
+	{
+		List<Part> parts = new List<Part>();
 		Bounds bounds = default;
 		bool hasBounds = false;
-		foreach (MeshRenderer renderer in valuable.GetComponentsInChildren<MeshRenderer>())
+		Matrix4x4 toRoot = source.transform.worldToLocalMatrix;
+		foreach (MeshRenderer renderer in source.GetComponentsInChildren<MeshRenderer>())
 		{
-			if (!renderer.enabled || !renderer.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null)
+			if (!renderer.enabled || !renderer.gameObject.activeSelf || !renderer.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null)
 			{
 				continue;
 			}
 
-			renderers.Add(renderer);
+			Material[] materials = renderer.sharedMaterials;
+			if (materials.Length == 0)
+			{
+				continue;
+			}
+
+			Matrix4x4 matrix = toRoot * renderer.transform.localToWorldMatrix;
+			parts.Add(new Part(filter.sharedMesh, materials, matrix));
+			Bounds partBounds = TransformBounds(filter.sharedMesh.bounds, matrix);
 			if (hasBounds)
 			{
-				bounds.Encapsulate(renderer.bounds);
+				bounds.Encapsulate(partBounds);
 			}
 			else
 			{
-				bounds = renderer.bounds;
+				bounds = partBounds;
 				hasBounds = true;
 			}
 		}
@@ -99,23 +192,31 @@ internal static class ValuableIconRenderer
 			return null;
 		}
 
-		float radius = Mathf.Max(bounds.extents.magnitude, 0.01f);
+		float radius = Mathf.Max(bounds.extents.magnitude, 0.001f);
 		float distance = radius / Mathf.Sin(FieldOfView * 0.5f * Mathf.Deg2Rad) * 1.1f;
 		Vector3 direction = new Vector3(0.6f, 0.45f, -1f).normalized;
 		Vector3 cameraPosition = FarOrigin + direction * distance;
 
+		AmbientMode previousAmbientMode = RenderSettings.ambientMode;
+		Color previousAmbientLight = RenderSettings.ambientLight;
+		bool previousFog = RenderSettings.fog;
 		RenderTexture target = new RenderTexture(Size, Size, 24, RenderTextureFormat.ARGB32);
 		GameObject cameraObject = new GameObject("PocketsIconCamera") { hideFlags = HideFlags.HideAndDontSave };
-		GameObject lightObject = new GameObject("PocketsIconLight") { hideFlags = HideFlags.HideAndDontSave };
-		RenderTexture previous = RenderTexture.active;
+		GameObject lightObject = new GameObject("PocketsIconLights") { hideFlags = HideFlags.HideAndDontSave };
+		RenderTexture previousActive = RenderTexture.active;
 		try
 		{
+			// Neutral studio lighting for this render only; everything is restored before the real frame renders.
+			RenderSettings.ambientMode = AmbientMode.Flat;
+			RenderSettings.ambientLight = new Color(0.55f, 0.55f, 0.55f);
+			RenderSettings.fog = false;
+
 			Camera camera = cameraObject.AddComponent<Camera>();
 			camera.enabled = false;
 			camera.clearFlags = CameraClearFlags.SolidColor;
 			camera.backgroundColor = new Color(0f, 0f, 0f, 0f);
 			camera.cullingMask = 1;
-			camera.nearClipPlane = 0.01f;
+			camera.nearClipPlane = 0.001f;
 			camera.farClipPlane = distance + radius * 4f;
 			camera.fieldOfView = FieldOfView;
 			camera.allowHDR = false;
@@ -124,26 +225,15 @@ internal static class ValuableIconRenderer
 			camera.transform.position = cameraPosition;
 			camera.transform.LookAt(FarOrigin);
 
-			Light light = lightObject.AddComponent<Light>();
-			light.type = LightType.Directional;
-			light.intensity = 1.1f;
-			light.shadows = LightShadows.None;
-			light.cullingMask = 1;
-			light.transform.rotation = Quaternion.LookRotation((FarOrigin - (cameraPosition + Vector3.up * distance * 0.5f)).normalized);
+			AddLight(lightObject, "Key", 1.0f, Quaternion.LookRotation(new Vector3(-0.5f, -0.7f, 0.6f)));
+			AddLight(lightObject, "Fill", 0.45f, Quaternion.LookRotation(new Vector3(0.7f, -0.2f, 0.5f)));
 
-			foreach (MeshRenderer renderer in renderers)
+			foreach (Part part in parts)
 			{
-				Mesh mesh = renderer.GetComponent<MeshFilter>().sharedMesh;
-				Material[] materials = renderer.sharedMaterials;
-				if (materials.Length == 0)
+				Matrix4x4 matrix = Matrix4x4.Translate(FarOrigin - bounds.center) * part.Matrix;
+				for (int sub = 0; sub < part.Mesh.subMeshCount; sub++)
 				{
-					continue;
-				}
-
-				Matrix4x4 matrix = Matrix4x4.Translate(FarOrigin - bounds.center) * renderer.localToWorldMatrix;
-				for (int sub = 0; sub < mesh.subMeshCount; sub++)
-				{
-					Graphics.DrawMesh(mesh, matrix, materials[Mathf.Min(sub, materials.Length - 1)], 0, camera, sub);
+					Graphics.DrawMesh(part.Mesh, matrix, part.Materials[Mathf.Min(sub, part.Materials.Length - 1)], 0, camera, sub);
 				}
 			}
 
@@ -160,17 +250,19 @@ internal static class ValuableIconRenderer
 				return null;
 			}
 
-			return Sprite.Create(texture, new Rect(0f, 0f, Size, Size), new Vector2(0.5f, 0.5f));
+			return texture;
 		}
 		finally
 		{
-			RenderTexture.active = previous;
+			RenderTexture.active = previousActive;
+			RenderSettings.ambientMode = previousAmbientMode;
+			RenderSettings.ambientLight = previousAmbientLight;
+			RenderSettings.fog = previousFog;
 
-			// Switch the light off right away: destruction is deferred and the light must not touch this frame's real scene.
-			Light? createdLight = lightObject.GetComponent<Light>();
-			if (createdLight != null)
+			// Switch the lights off right away: destruction is deferred and they must not touch this frame's real scene.
+			foreach (Light light in lightObject.GetComponentsInChildren<Light>())
 			{
-				createdLight.enabled = false;
+				light.enabled = false;
 			}
 
 			lightObject.SetActive(false);
@@ -179,6 +271,32 @@ internal static class ValuableIconRenderer
 			target.Release();
 			Object.Destroy(target);
 		}
+	}
+
+	private static void AddLight(GameObject parent, string name, float intensity, Quaternion rotation)
+	{
+		GameObject child = new GameObject(name) { hideFlags = HideFlags.HideAndDontSave };
+		child.transform.SetParent(parent.transform, false);
+		child.transform.rotation = rotation;
+		Light light = child.AddComponent<Light>();
+		light.type = LightType.Directional;
+		light.intensity = intensity;
+		light.shadows = LightShadows.None;
+		light.cullingMask = 1;
+	}
+
+	private static Bounds TransformBounds(Bounds local, Matrix4x4 matrix)
+	{
+		Vector3 center = matrix.MultiplyPoint3x4(local.center);
+		Vector3 extents = local.extents;
+		Vector3 axisX = matrix.MultiplyVector(new Vector3(extents.x, 0f, 0f));
+		Vector3 axisY = matrix.MultiplyVector(new Vector3(0f, extents.y, 0f));
+		Vector3 axisZ = matrix.MultiplyVector(new Vector3(0f, 0f, extents.z));
+		Vector3 worldExtents = new Vector3(
+			Mathf.Abs(axisX.x) + Mathf.Abs(axisY.x) + Mathf.Abs(axisZ.x),
+			Mathf.Abs(axisX.y) + Mathf.Abs(axisY.y) + Mathf.Abs(axisZ.y),
+			Mathf.Abs(axisX.z) + Mathf.Abs(axisY.z) + Mathf.Abs(axisZ.z));
+		return new Bounds(center, worldExtents * 2f);
 	}
 
 	private static bool HasVisiblePixels(Texture2D texture)

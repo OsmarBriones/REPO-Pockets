@@ -31,6 +31,12 @@ namespace Pockets
 				Logger.LogWarning("Spike hotkeys are enabled (Debug.EnableSpikes). Developer use only.");
 			}
 
+			if (ConfigurationController.IconBakeEnabled)
+			{
+				this.gameObject.AddComponent<Ui.IconBaker>();
+				Logger.LogWarning("Icon baking is enabled (Debug.EnableIconBake): press F10 inside a level. Developer use only.");
+			}
+
 			Harmony = new Harmony(Info.Metadata.GUID);
 			Harmony.PatchAll();
 

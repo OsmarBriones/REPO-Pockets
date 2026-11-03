@@ -11,6 +11,7 @@ namespace Pockets
 		private static ConfigEntry<bool>? DropOnDeathEntry { get; set; }
 		private static ConfigEntry<bool>? ShowSlotValueEntry { get; set; }
 		private static ConfigEntry<bool>? EnableSpikes { get; set; }
+		private static ConfigEntry<bool>? EnableIconBake { get; set; }
 
 		internal static bool IsEnabled => Enabled?.Value ?? true;
 
@@ -26,6 +27,9 @@ namespace Pockets
 		/// <summary>Opt-in prototype hotkeys for the technical spikes in plan.md. Disabled by default.</summary>
 		internal static bool SpikesEnabled => EnableSpikes?.Value ?? false;
 
+		/// <summary>Opt-in developer tool: F10 renders every valuable prefab to a PNG in BepInEx/PocketIcons. Disabled by default.</summary>
+		internal static bool IconBakeEnabled => EnableIconBake?.Value ?? false;
+
 		internal static void Initialize(ConfigFile config)
 		{
 			ConfigFile = config;
@@ -39,6 +43,9 @@ namespace Pockets
 				"Show the stored valuable's current value on its inventory slot.");
 			EnableSpikes = ConfigFile.Bind("Debug", nameof(EnableSpikes), false,
 				"Developer only. Enables prototype hotkeys (F6 hide or show the held valuable, F7 dump its state, F8 sync test, F9 host property test).");
+
+			EnableIconBake = ConfigFile.Bind("Debug", nameof(EnableIconBake), false,
+				"Developer only. Press F10 inside a level to render a picture of every valuable to BepInEx/PocketIcons.");
 
 			ConfigFile.Save();
 		}
