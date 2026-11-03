@@ -21,7 +21,12 @@ Result (2026-11-02, singleplayer, two valuables: Museum Tooth, Museum Fish): **w
 - After showing, the valuable **fell to the floor instead of landing in the player's hands**. Vanilla items are re-grabbed automatically (`ItemEquippable.ForceGrab`, 1.5 s); Pockets must do the same (task T021).
 - The first show position was `camera + forward * 1.5` with no raycast. Facing a wall closer than that, the valuable ended up inside or beyond the wall and looked like it vanished. Use the vanilla `RayHitTestNew` approach: raycast, then `hit.point + hit.normal * bounds extents` (now in the spike).
 
-Result: S1 **partially confirmed**.
+Second run (updated spike, singleplayer, Wizard Bird Skull, Tiny, value 500): **confirmed**.
+- Hidden: `hidden=True scale=0.010 colliders=0/4 kinematic=True grabbers=0` (the grab was released).
+- Shown: `hidden=False scale=1.000 colliders=4/4 kinematic=False grabbers=1` (the player was re-grabbing it, so the auto-grab works).
+- The dollar value stayed at 500 through hide and show; the cycle also repeated cleanly a second time.
+
+Result: S1 **confirmed** (singleplayer).
 
 ## S3: runtime component with RPC (host plus client)
 
@@ -29,7 +34,7 @@ Steps: host and client in a level; the host grabs a valuable and presses F6; the
 
 Expected: both consoles show `[Spike S3] hide RPC received on host` and `... on client` for the same view id, and the object is hidden on both machines. Showing it again behaves the same way.
 
-Result: _pending_
+Result: **only the singleplayer path was exercised** (RPC methods on the runtime-added component run, `view 0`). The host-and-client case was not tested, so S3 is still open.
 
 ## S4: who simulates a hidden Tiny/Small valuable
 
@@ -37,7 +42,7 @@ Steps: hide a Tiny valuable from the host, press F7 on the host and on the clien
 
 Expected: `kinematic=True` on both, and the hidden object does not drift or fall. Repeat after showing it: it falls and behaves like a normal valuable on both machines (`clientNonKinematic` is logged for reference).
 
-Result: _pending_
+Result: singleplayer only. `clientNonKinematic=True` for this Tiny valuable (as read in the code); forcing `kinematic=True` while hidden and restoring it to `False` afterwards worked on the host. The client side is not tested, so S4 is still open.
 
 ## S5: haul leak and other valuable iterators
 
@@ -50,10 +55,14 @@ Result (2026-11-02): **inconclusive**. No exceptions, but no F7 dump and no `[Sp
 - `inStartRoom` stays `true` after the guard blocks the add, so a valuable shown again inside the extraction room would never be re-added until it leaves and re-enters. Reset `inStartRoom = false` on release (now in the spike).
 - A second run is needed with the updated spike: hide it inside the room, press F7, press F6 to show it still inside the room, press F7, wait about a second and check `inHaulList` becomes true again.
 
+Second run (2026-11-02): still **inconclusive**. Every dump reads `inExtractionRoom=False` and `inHaulList=False`, so the valuable was not inside an extraction room (or its room list did not update, which is itself unknown for a hidden object). Next time confirm first, with F7 while the valuable is shown inside the zone, that `inExtractionRoom=True` before hiding it.
+
 ## S2: late-join sync
 
 Steps: the host hides a valuable (F6) and presses F8; a third instance joins late and presses F8.
 
 Expected for the buffered-RPC path: the late joiner sees the valuable already hidden. Expected for the property path: the late joiner's F8 list shows the host's `pockets.spike` value. Then the host presses F9 on a client to learn whether the master can write another player's property (`SetCustomProperties returned True` and the value arrives).
+
+Result: **not tested**. F8 was pressed three times while not in a multiplayer room (`[Spike S2] not in a room`), as expected in singleplayer.
 
 Decision: _pending_ (buffered RPC vs player custom properties)
