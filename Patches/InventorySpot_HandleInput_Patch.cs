@@ -62,6 +62,7 @@ internal static class InventorySpot_HandleInput_Patch
 
 		if (CanSendRequest())
 		{
+			PocketsPlugin.Logger.LogInfo($"Slot {spot + 1} pressed holding {held.name}: asking to store it");
 			held.RequestStore(spot);
 		}
 

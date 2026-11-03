@@ -154,6 +154,7 @@ internal sealed class PocketedValuable : MonoBehaviourPun
 
 		Hide();
 
+		PocketsPlugin.Logger.LogInfo($"Stored {name} (value {valuable.dollarValueCurrent:F0}) in slot {slot} of player {playerKey}");
 		PocketsApi.RaiseStored(new PocketEvent(playerKey, slot, Key, valuable));
 		RefreshLocalSlot(playerKey, slot);
 	}
@@ -255,6 +256,7 @@ internal sealed class PocketedValuable : MonoBehaviourPun
 			physGrabObject.Teleport(position, rotation);
 		}
 
+		PocketsPlugin.Logger.LogInfo($"Released {name} (value {valuable.dollarValueCurrent:F0}) from slot {slot} of player {playerKey}");
 		PocketsApi.RaiseRemoved(new PocketEvent(playerKey, slot, valuableKey, valuable));
 		RefreshLocalSlot(playerKey, slot);
 
