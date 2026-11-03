@@ -75,3 +75,7 @@ Expected for the buffered-RPC path: the late joiner sees the valuable already hi
 Result so far: in a lobby hosted alone, the local player property was written and read back (`pockets.spike=` after a second press; the first read returned `<none>` because the write is asynchronous). **Late joiner, remote client and master-writes-other-player were not tested.**
 
 Decision: _pending_ (buffered RPC vs player custom properties)
+
+## Other findings
+
+- **Singleplayer view ids:** every valuable reports `PhotonView.ViewID = 0` in singleplayer (seen for Museum Tooth, Museum Fish and Wizard Bird Skull), while in a multiplayer lobby they have real ids (for example 92). The pocket layer therefore identifies a valuable by an opaque key supplied by the integration layer (view id in multiplayer, `GetInstanceID()` in singleplayer); the pure `PocketState` only requires it to differ from `NoValuable`.

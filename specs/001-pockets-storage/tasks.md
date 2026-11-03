@@ -41,10 +41,10 @@ description: "Task list for the Pockets storage feature"
 
 **Purpose**: Pure logic and settings that every story needs
 
-- [ ] T011 [US4] Implement `Configuration/ConfigurationController.cs` (`Enabled`, `MaxValuableSize`, `DropOnDeath`, `ShowSlotValue`) and wire it in `PocketsPlugin.cs`; the host's values are authoritative and sent to clients on join
-- [ ] T012 [P] [US4] Implement `Domain/SizePolicy.cs` (accept by `ValuableVolume.Type` enum order up to `MaxValuableSize`) with Tier 1 tests in `Pockets.Tests/`
-- [ ] T013 [P] Implement `Domain/PocketState.cs` (3 slots, `TryStore`, `TryRelease`, `Clear`, no Unity types) with Tier 1 tests
-- [ ] T014 [P] Implement the public `Api/PocketsApi.cs` surface (`GetStored`, `IsPocketed`, `Stored`/`Removed` events, `PlayerDying`, `TryRemove`) over `PocketState`
+- [x] T011 [US4] Implement `ConfigurationController.cs` (`Enabled`, `MaxValuableSize`, `DropOnDeath`, `ShowSlotValue`) and wire it in `PocketsPlugin.cs` (bindings done; the host-authoritative sync is T034)
+- [x] T012 [P] [US4] Implement `Domain/SizePolicy.cs` (accept by the game's volume order up to `MaxValuableSize`, via the game-free `PocketSize` enum) with Tier 1 tests in `Pockets.Tests/`
+- [x] T013 [P] Implement `Domain/PocketState.cs` (3 slots, `TryStore`, `TryRelease`, `Clear`, no Unity types) with Tier 1 tests
+- [x] T014 [P] Implement the public `Api/PocketsApi.cs` surface (`GetStored`, `IsPocketed`, `Stored`/`Removed` events, `PlayerDying`) over `PocketState`; `TryRemove` is added with the release flow (T021)
 
 ---
 
@@ -58,6 +58,9 @@ description: "Task list for the Pockets storage feature"
 - [ ] T018 [US1] Implement the store branch of `Patches/InventorySpot_HandleInput_Patch.cs` (prefix, consume the key)
 - [ ] T019 [US1] Implement `Patches/InventorySpot_Occupied_Patch.cs` so vanilla never equips into a pocketed slot
 - [ ] T020 [US1] Implement `Patches/ValuableObject_AddToDollarHaulList_Patch.cs`, remove an already listed valuable from the haul list on store, and reset `inStartRoom` on release so it can be re-added inside an extraction room (haul leak; see research S5)
+
+- [ ] T034 [US4] Make `MaxValuableSize` and `DropOnDeath` host-authoritative: clients use the host's values, sent on join and when the host changes them
+- [ ] T035 [US1] Choose the valuable key in the integration layer: PhotonView id in multiplayer, `GetInstanceID()` in singleplayer (every valuable's view id is 0 there, see research S1)
 
 ---
 
