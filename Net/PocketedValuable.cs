@@ -2,6 +2,7 @@ using System.Collections;
 using System.Linq;
 using Photon.Pun;
 using Pockets.Api;
+using Pockets.Ui;
 using UnityEngine;
 
 namespace Pockets.Net;
@@ -151,6 +152,12 @@ internal sealed class PocketedValuable : MonoBehaviourPun
 		IsPocketed = true;
 		PlayerKey = playerKey;
 		Slot = slot;
+
+		// The slot picture is only needed on the owner's machine, and must be taken while the valuable is still full size.
+		if (playerKey == PlayerKeys.Local())
+		{
+			ValuableIconRenderer.Ensure(gameObject);
+		}
 
 		Hide();
 
