@@ -195,11 +195,13 @@ internal sealed class SpikePocketed : MonoBehaviourPun
 		ValuableObject? valuable = GetComponent<ValuableObject>();
 		bool inHaul = RoundDirector.instance != null && RoundDirector.instance.dollarHaulList.Contains(gameObject);
 		bool inExtractionRoom = false;
+		List<string> roomNames = new List<string>();
 		if (physGrabObject != null && physGrabObject.roomVolumeCheck != null)
 		{
 			foreach (RoomVolume room in physGrabObject.roomVolumeCheck.CurrentRooms)
 			{
 				inExtractionRoom |= room.Extraction;
+				roomNames.Add($"{room.name}{(room.Extraction ? "(extraction)" : string.Empty)}");
 			}
 		}
 
@@ -208,7 +210,8 @@ internal sealed class SpikePocketed : MonoBehaviourPun
 			+ $"colliders={enabledColliders}/{colliders.Length} kinematic={(body != null ? body.isKinematic.ToString() : "n/a")} "
 			+ $"clientNonKinematic={(physGrabObject != null ? physGrabObject.clientNonKinematic.ToString() : "n/a")} "
 			+ $"volume={(valuable != null ? valuable.volumeType.ToString() : "n/a")} value={(valuable != null ? valuable.dollarValueCurrent.ToString("F0") : "n/a")} "
-			+ $"inHaulList={inHaul} inExtractionRoom={inExtractionRoom} grabbers={(physGrabObject != null ? physGrabObject.playerGrabbing.Count : 0)}";
+			+ $"inHaulList={inHaul} inExtractionRoom={inExtractionRoom} rooms=[{string.Join(", ", roomNames)}] "
+			+ $"inStartRoom={(valuable != null ? valuable.inStartRoom.ToString() : "n/a")} committed={(valuable != null ? valuable.committedToExtraction.ToString() : "n/a")} grabbers={(physGrabObject != null ? physGrabObject.playerGrabbing.Count : 0)}";
 	}
 
 	private static string Role()
