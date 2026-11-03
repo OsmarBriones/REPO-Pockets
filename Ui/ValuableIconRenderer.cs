@@ -193,8 +193,8 @@ internal static class ValuableIconRenderer
 		}
 
 		float radius = Mathf.Max(bounds.extents.magnitude, 0.001f);
-		float distance = radius / Mathf.Sin(FieldOfView * 0.5f * Mathf.Deg2Rad) * 1.1f;
 		Vector3 direction = new Vector3(0.6f, 0.45f, -1f).normalized;
+		float distance = FitDistance(bounds, direction, radius);
 		Vector3 cameraPosition = FarOrigin + direction * distance;
 
 		AmbientMode previousAmbientMode = RenderSettings.ambientMode;
@@ -271,6 +271,33 @@ internal static class ValuableIconRenderer
 			target.Release();
 			Object.Destroy(target);
 		}
+	}
+
+	/// <summary>
+	/// The closest camera distance (along <paramref name="direction"/> from the bounds center) at which every corner of the
+	/// bounds still fits the view, so every icon fills its square instead of leaving wide margins.
+	/// </summary>
+	private static float FitDistance(Bounds bounds, Vector3 direction, float radius)
+	{
+		float tangent = Mathf.Tan(FieldOfView * 0.5f * Mathf.Deg2Rad) * 0.94f;
+		Vector3 forward = -direction;
+		Vector3 right = Vector3.Cross(Vector3.up, forward).normalized;
+		Vector3 up = Vector3.Cross(forward, right);
+
+		float distance = radius * 0.5f;
+		for (int corner = 0; corner < 8; corner++)
+		{
+			Vector3 offset = new Vector3(
+				(corner & 1) == 0 ? -bounds.extents.x : bounds.extents.x,
+				(corner & 2) == 0 ? -bounds.extents.y : bounds.extents.y,
+				(corner & 4) == 0 ? -bounds.extents.z : bounds.extents.z);
+			float x = Vector3.Dot(offset, right);
+			float y = Vector3.Dot(offset, up);
+			float depth = Vector3.Dot(offset, forward);
+			distance = Mathf.Max(distance, Mathf.Abs(x) / tangent - depth, Mathf.Abs(y) / tangent - depth);
+		}
+
+		return distance * 1.04f;
 	}
 
 	private static void AddLight(GameObject parent, string name, float intensity, Quaternion rotation)
