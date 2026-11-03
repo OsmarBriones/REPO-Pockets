@@ -57,6 +57,22 @@ public static class PocketsApi
 		return pockets;
 	}
 
+	/// <summary>The pockets of a player, or null when nothing has been registered for them.</summary>
+	internal static PlayerPockets? Find(int playerKey)
+	{
+		return Players.TryGetValue(playerKey, out PlayerPockets? pockets) ? pockets : null;
+	}
+
+	/// <summary>Drops a registration silently (no events), for example when the valuable object is destroyed.</summary>
+	internal static void Forget(int playerKey, int slot)
+	{
+		PlayerPockets? pockets = Find(playerKey);
+		if (pockets != null && pockets.State.TryRelease(slot, out _))
+		{
+			pockets.Valuables[slot] = null;
+		}
+	}
+
 	internal static void ClearAll()
 	{
 		foreach (PlayerPockets pockets in Players.Values)

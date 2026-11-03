@@ -52,15 +52,17 @@ description: "Task list for the Pockets storage feature"
 
 **Goal**: User Story 1, storing a held valuable in a free slot
 
-- [ ] T015 [US1] Implement `Net/PocketedValuable.cs` (runtime component: store/hide RPCs, kinematic handling per S4)
-- [ ] T016 [US1] Implement `Patches/ValuableObject_Start_Patch.cs` (add `PocketedValuable` and refresh the RPC cache on every client)
-- [ ] T017 [US1] Implement `Net/PocketSync.cs` request, host validation and broadcast; refuse non-valuable, oversize, `committedToExtraction`, held by another player or a monster or a cart, dead or downed player, arena or shop run, no free slot; active only when `SemiFunc.RunIsLevel()`
-- [ ] T018 [US1] Implement the store branch of `Patches/InventorySpot_HandleInput_Patch.cs` (prefix, consume the key)
-- [ ] T019 [US1] Implement `Patches/InventorySpot_Occupied_Patch.cs` so vanilla never equips into a pocketed slot
-- [ ] T020 [US1] Implement `Patches/ValuableObject_AddToDollarHaulList_Patch.cs`, remove an already listed valuable from the haul list on store, and reset `inStartRoom` on release so it can be re-added inside an extraction room (haul leak; see research S5)
+**Status**: implemented and compiling (0 warnings). Not yet tested in the game; the host-and-client behavior still depends on spikes S3, S4 and S2. The inStartRoom reset from research S5 moves to the release flow (T021) and is probably unnecessary.
+
+- [x] T015 [US1] Implement `Net/PocketedValuable.cs` (runtime component: store/hide RPCs, kinematic handling per S4)
+- [x] T016 [US1] Implement `Patches/ValuableObject_Start_Patch.cs` (add `PocketedValuable` and refresh the RPC cache on every client)
+- [x] T017 [US1] Implement `Net/PocketSync.cs` request, host validation and broadcast; refuse non-valuable, oversize, `committedToExtraction`, held by another player or a monster or a cart, dead or downed player, arena or shop run, no free slot; active only when `SemiFunc.RunIsLevel()`
+- [x] T018 [US1] Implement the store branch of `Patches/InventorySpot_HandleInput_Patch.cs` (prefix, consume the key)
+- [x] T019 [US1] Implement `Patches/InventorySpot_Occupied_Patch.cs` so vanilla never equips into a pocketed slot
+- [x] T020 [US1] Implement `Patches/ValuableObject_AddToDollarHaulList_Patch.cs`, remove an already listed valuable from the haul list on store, and reset `inStartRoom` on release so it can be re-added inside an extraction room (haul leak; see research S5)
 
 - [ ] T034 [US4] Make `MaxValuableSize` and `DropOnDeath` host-authoritative: clients use the host's values, sent on join and when the host changes them
-- [ ] T035 [US1] Choose the valuable key in the integration layer: PhotonView id in multiplayer, `GetInstanceID()` in singleplayer (every valuable's view id is 0 there, see research S1)
+- [x] T035 [US1] Choose the valuable key in the integration layer: PhotonView id in multiplayer, `GetInstanceID()` in singleplayer (every valuable's view id is 0 there, see research S1)
 
 ---
 
@@ -87,7 +89,7 @@ description: "Task list for the Pockets storage feature"
 **Goal**: User Story 4 and the lifecycle edge cases
 
 - [ ] T025 [US4] Implement `Patches/PlayerAvatar_PlayerDeath_Patch.cs`: raise the cancelable `PlayerDying` event, then drop pockets at the player's position when `DropOnDeath` is on
-- [ ] T026 [US4] Clear all pocket state on level start so nothing persists across levels
+- [x] T026 [US4] Clear all pocket state on level start so nothing persists across levels
 - [ ] T027 [US4] Sync the full pocket state to late joiners using the mechanism chosen in T009
 - [ ] T028 [US4] Drop a player's pockets when they disconnect
 
