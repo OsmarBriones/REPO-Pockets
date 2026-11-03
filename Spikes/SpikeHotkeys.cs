@@ -26,23 +26,40 @@ internal sealed class SpikeHotkeys : MonoBehaviour
 
 		if (keyboard.f6Key.wasPressedThisFrame)
 		{
+			PocketsPlugin.Logger.LogInfo("[Spike key] F6");
 			ToggleHeld();
 		}
 
 		if (keyboard.f7Key.wasPressedThisFrame)
 		{
+			PocketsPlugin.Logger.LogInfo("[Spike key] F7");
 			Dump();
 		}
 
 		if (keyboard.f8Key.wasPressedThisFrame)
 		{
+			PocketsPlugin.Logger.LogInfo("[Spike key] F8");
 			PublishAndList();
 		}
 
 		if (keyboard.f9Key.wasPressedThisFrame)
 		{
+			PocketsPlugin.Logger.LogInfo("[Spike key] F9");
 			HostWritesOtherPlayers();
 		}
+	}
+
+	/// <summary>Position in front of the camera that stays out of walls, like <c>ItemEquippable.RayHitTestNew</c>.</summary>
+	private static Vector3 ShowPosition(Transform view, float offset)
+	{
+		const float distance = 1.5f;
+		int mask = (int)SemiFunc.LayerMaskGetVisionObstruct() & ~LayerMask.GetMask("Ignore Raycast", "CollisionCheck");
+		if (Physics.Raycast(view.position, view.forward, out RaycastHit hit, distance, mask))
+		{
+			return hit.point + hit.normal * offset;
+		}
+
+		return view.position + view.forward * distance;
 	}
 
 	private static SpikePocketed? HeldValuable()
@@ -72,7 +89,8 @@ internal sealed class SpikeHotkeys : MonoBehaviour
 		{
 			Transform view = camera.transform;
 			PocketsPlugin.Logger.LogInfo($"[Spike S1] showing hidden valuable {last.name} in front of the camera");
-			last.RequestShow(view.position + view.forward * 1.5f, Quaternion.LookRotation(view.forward, Vector3.up));
+			int grabberViewId = PhysGrabber.instance != null && PhysGrabber.instance.photonView != null ? PhysGrabber.instance.photonView.ViewID : -1;
+			last.RequestShow(ShowPosition(view, last.ShowOffset), Quaternion.LookRotation(view.forward, Vector3.up), grabberViewId);
 			return;
 		}
 

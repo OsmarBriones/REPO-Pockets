@@ -17,7 +17,11 @@ Steps: start a level, grab a Tiny valuable, press F6, press F7, walk around, pre
 
 Expected: after F6 the valuable disappears and the grab is released; F7 shows `hidden=True`, scale about 0.01, `colliders=0/n`, `kinematic=True`; after the second F6 it reappears in front of the camera with `hidden=False`, original scale and colliders, and the same `value`.
 
-Result: _pending_
+Result (2026-11-02, singleplayer, two valuables: Museum Tooth, Museum Fish): **works**. Hide and show each ran twice per valuable, the RPC component was reached, the valuable disappeared and came back, and the log has no exceptions. Not confirmed: the F7 state dump never appeared in the log (no `[Spike dump]` line at all), so scale, colliders and kinematic state were not measured; a re-run with key logging is queued. Findings:
+- After showing, the valuable **fell to the floor instead of landing in the player's hands**. Vanilla items are re-grabbed automatically (`ItemEquippable.ForceGrab`, 1.5 s); Pockets must do the same (task T021).
+- The first show position was `camera + forward * 1.5` with no raycast. Facing a wall closer than that, the valuable ended up inside or beyond the wall and looked like it vanished. Use the vanilla `RayHitTestNew` approach: raycast, then `hit.point + hit.normal * bounds extents` (now in the spike).
+
+Result: S1 **partially confirmed**.
 
 ## S3: runtime component with RPC (host plus client)
 
@@ -41,7 +45,10 @@ Steps: carry a valuable into the extraction room, press F6 there, wait a few sec
 
 Expected: F7 shows `inExtractionRoom=True` but `inHaulList=False`, the log shows `[Spike S5] blocked haul list add ...`, and no exceptions appear in the log from other valuable code.
 
-Result: _pending_
+Result (2026-11-02): **inconclusive**. No exceptions, but no F7 dump and no `[Spike S5] blocked` line. Likely cause: the valuable had already been added to the haul list (it polls every 0.5 s) before being hidden, so the add guard never fired. From reading `ValuableObject.Update`:
+- Hiding must also **remove the valuable from the haul list** (now in the spike, master only, skipped when `committedToExtraction`).
+- `inStartRoom` stays `true` after the guard blocks the add, so a valuable shown again inside the extraction room would never be re-added until it leaves and re-enters. Reset `inStartRoom = false` on release (now in the spike).
+- A second run is needed with the updated spike: hide it inside the room, press F7, press F6 to show it still inside the room, press F7, wait about a second and check `inHaulList` becomes true again.
 
 ## S2: late-join sync
 

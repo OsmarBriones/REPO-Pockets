@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Photon.Pun;
@@ -59,15 +60,35 @@ internal sealed class SpikePocketed : MonoBehaviourPun
 		}
 	}
 
-	internal void RequestShow(Vector3 position, Quaternion rotation)
+	/// <summary>Distance from the center to the farthest bound, measured before hiding; used to keep the shown object out of walls.</summary>
+	internal float ShowOffset { get; private set; }
+
+	internal void RequestShow(Vector3 position, Quaternion rotation, int grabberViewId)
 	{
 		if (SemiFunc.IsMultiplayer())
 		{
-			photonView.RPC(nameof(SpikeShowRpc), RpcTarget.AllBuffered, position, rotation);
+			photonView.RPC(nameof(SpikeShowRpc), RpcTarget.AllBuffered, position, rotation, grabberViewId);
 		}
 		else
 		{
-			SpikeShowRpc(position, rotation);
+			SpikeShowRpc(position, rotation, grabberViewId);
+		}
+	}
+
+	private IEnumerator ForceGrab()
+	{
+		// Same idea as ItemEquippable.ForceGrab: keep grabbing the object for a moment after taking it out.
+		float timer = 1.5f;
+		while (timer > 0f && physGrabObject != null && PhysGrabber.instance != null)
+		{
+			PhysGrabber.instance.OverrideGrab(physGrabObject);
+			if (SemiFunc.InputUp(InputKey.Grab))
+			{
+				break;
+			}
+
+			timer -= Time.deltaTime;
+			yield return null;
 		}
 	}
 
@@ -91,9 +112,20 @@ internal sealed class SpikePocketed : MonoBehaviourPun
 		originalScale = transform.localScale;
 		colliders = GetComponentsInChildren<Collider>();
 		colliderStates = colliders.Select(collider => collider.enabled).ToArray();
+		Bounds bounds = new Bounds(transform.position, Vector3.zero);
 		foreach (Collider collider in colliders)
 		{
+			bounds.Encapsulate(collider.bounds);
 			collider.enabled = false;
+		}
+
+		ShowOffset = bounds.extents.magnitude;
+
+		// Keep a hidden valuable out of the haul list (plan: remove on store). Only the master owns the list.
+		ValuableObject? valuable = GetComponent<ValuableObject>();
+		if (valuable != null && SemiFunc.IsMasterClientOrSingleplayer() && !valuable.committedToExtraction)
+		{
+			valuable.RemoveFromDollarHaulList();
 		}
 
 		transform.localScale = originalScale * HiddenScaleFactor;
@@ -111,7 +143,7 @@ internal sealed class SpikePocketed : MonoBehaviourPun
 	}
 
 	[PunRPC]
-	private void SpikeShowRpc(Vector3 position, Quaternion rotation, PhotonMessageInfo info = default)
+	private void SpikeShowRpc(Vector3 position, Quaternion rotation, int grabberViewId, PhotonMessageInfo info = default)
 	{
 		PocketsPlugin.Logger.LogInfo($"[Spike S3] show RPC received on {Role()} for view {photonView.ViewID} from {info.Sender?.NickName ?? "local"}");
 		if (!IsHidden || physGrabObject == null)
@@ -140,6 +172,21 @@ internal sealed class SpikePocketed : MonoBehaviourPun
 		if (SemiFunc.IsMasterClientOrSingleplayer())
 		{
 			physGrabObject.Teleport(position, rotation);
+
+			// ValuableObject.Update only adds to the haul list when it enters an extraction room; forget the old flag
+			// so a valuable shown inside the room is added again.
+			ValuableObject? valuable = GetComponent<ValuableObject>();
+			if (valuable != null)
+			{
+				valuable.inStartRoom = false;
+			}
+		}
+
+		bool isGrabber = PhysGrabber.instance != null
+			&& (!SemiFunc.IsMultiplayer() || PhysGrabber.instance.photonView.ViewID == grabberViewId);
+		if (isGrabber)
+		{
+			StartCoroutine(ForceGrab());
 		}
 	}
 

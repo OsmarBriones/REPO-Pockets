@@ -27,7 +27,7 @@ As a player, I want to press the key of an occupied slot to drop its valuable in
 
 **Acceptance Scenarios**:
 
-1. **Given** a stored valuable, **When** I press that slot's key, **Then** the valuable appears in front of me and the slot is free.
+1. **Given** a stored valuable, **When** I press that slot's key, **Then** the valuable appears in front of me (never inside a wall), I am holding it, and the slot is free.
 
 ### User Story 3 - See the stored value (Priority: P2)
 

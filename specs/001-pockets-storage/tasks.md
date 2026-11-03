@@ -57,7 +57,7 @@ description: "Task list for the Pockets storage feature"
 - [ ] T017 [US1] Implement `Net/PocketSync.cs` request, host validation and broadcast; refuse non-valuable, oversize, `committedToExtraction`, held by another player or a monster or a cart, dead or downed player, arena or shop run, no free slot; active only when `SemiFunc.RunIsLevel()`
 - [ ] T018 [US1] Implement the store branch of `Patches/InventorySpot_HandleInput_Patch.cs` (prefix, consume the key)
 - [ ] T019 [US1] Implement `Patches/InventorySpot_Occupied_Patch.cs` so vanilla never equips into a pocketed slot
-- [ ] T020 [US1] Implement `Patches/ValuableObject_AddToDollarHaulList_Patch.cs` and remove an already listed valuable from the haul list on store (haul leak)
+- [ ] T020 [US1] Implement `Patches/ValuableObject_AddToDollarHaulList_Patch.cs`, remove an already listed valuable from the haul list on store, and reset `inStartRoom` on release so it can be re-added inside an extraction room (haul leak; see research S5)
 
 ---
 
@@ -65,7 +65,7 @@ description: "Task list for the Pockets storage feature"
 
 **Goal**: User Story 2
 
-- [ ] T021 [US2] Implement the release flow in `Net/PocketSync.cs` and `Net/PocketedValuable.cs`: raycast position as in `ItemEquippable.RayHitTestNew`, restore scale, colliders, mass and physics, free the slot
+- [ ] T021 [US2] Implement the release flow in `Net/PocketSync.cs` and `Net/PocketedValuable.cs`: raycast position as in `ItemEquippable.RayHitTestNew` (stay out of walls), restore scale, colliders, mass and physics, free the slot, and **auto-grab the valuable for the player for about 1.5 s** like `ItemEquippable.ForceGrab` (research S1)
 - [ ] T022 [US2] Add the release branch to `Patches/InventorySpot_HandleInput_Patch.cs`
 
 ---
