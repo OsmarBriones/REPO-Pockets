@@ -154,7 +154,7 @@ internal static class ValuableIconRenderer
 	/// Renders a valuable (a scene instance or a prefab asset) to a square transparent texture with studio lighting.
 	/// Returns null when there is nothing to draw or the picture came out empty. Also used by the icon baking tool.
 	/// </summary>
-	internal static Texture2D? RenderTexture2D(GameObject source)
+	internal static Texture2D? RenderTexture2D(GameObject source, int size = Size)
 	{
 		List<Part> parts = new List<Part>();
 		Bounds bounds = default;
@@ -200,7 +200,7 @@ internal static class ValuableIconRenderer
 		AmbientMode previousAmbientMode = RenderSettings.ambientMode;
 		Color previousAmbientLight = RenderSettings.ambientLight;
 		bool previousFog = RenderSettings.fog;
-		RenderTexture target = new RenderTexture(Size, Size, 24, RenderTextureFormat.ARGB32);
+		RenderTexture target = new RenderTexture(size, size, 24, RenderTextureFormat.ARGB32);
 		GameObject cameraObject = new GameObject("PocketsIconCamera") { hideFlags = HideFlags.HideAndDontSave };
 		GameObject lightObject = new GameObject("PocketsIconLights") { hideFlags = HideFlags.HideAndDontSave };
 		RenderTexture previousActive = RenderTexture.active;
@@ -240,8 +240,8 @@ internal static class ValuableIconRenderer
 			camera.Render();
 
 			RenderTexture.active = target;
-			Texture2D texture = new Texture2D(Size, Size, TextureFormat.RGBA32, false);
-			texture.ReadPixels(new Rect(0f, 0f, Size, Size), 0, 0);
+			Texture2D texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+			texture.ReadPixels(new Rect(0f, 0f, size, size), 0, 0);
 			texture.Apply();
 
 			if (!HasVisiblePixels(texture))

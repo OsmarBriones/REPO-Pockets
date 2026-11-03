@@ -19,6 +19,9 @@ internal sealed class IconBaker : MonoBehaviour
 		"valuables/05 wide", "valuables/06 tall", "valuables/07 very tall",
 	};
 
+	/// <summary>Baked at twice the packaged size so the files can be cropped and downscaled crisply.</summary>
+	private const int BakeSize = 256;
+
 	private bool running;
 
 	private void Update()
@@ -49,7 +52,7 @@ internal sealed class IconBaker : MonoBehaviour
 				Texture2D? texture = null;
 				try
 				{
-					texture = ValuableIconRenderer.RenderTexture2D(prefab);
+					texture = ValuableIconRenderer.RenderTexture2D(prefab, BakeSize);
 					if (texture != null)
 					{
 						File.WriteAllBytes(Path.Combine(outputFolder, key + ".png"), texture.EncodeToPNG());
