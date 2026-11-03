@@ -1,0 +1,95 @@
+name: Publish to Thunderstore
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish to Thunderstore
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Release Package
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          $tag = if ('${{ github.event.release.tag_name }}') {
+            '${{ github.event.release.tag_name }}'
+          } elseif ($env:GITHUB_REF_TYPE -eq 'tag') {
+            $env:GITHUB_REF_NAME
+          } else {
+            (gh release list --limit 1 --json tagName --jq '.[0].tagName')
+          }
+          Write-Host "Resolved release tag: $tag"
+          gh release download $tag --dir dist --pattern "*.zip"
+          $zip = Get-ChildItem -Path dist/*.zip | Select-Object -First 1
+          if (-not $zip) {
+            throw "No packaged .zip found in GitHub Release for tag $tag."
+          }
+          Write-Host "Found release package: $($zip.FullName)"
+
+      - name: Read Package Metadata
+        id: pkg_info
+        shell: pwsh
+        run: |
+          $manifest = Get-Content manifest.json -Raw | ConvertFrom-Json
+          $zip = Get-ChildItem -Path dist/*.zip | Select-Object -First 1
+          Copy-Item $zip.FullName -Destination .
+          $categories = "mods"
+          if (Test-Path categories.txt) {
+            $catLines = Get-Content categories.txt | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { $_.Trim().ToLowerInvariant() }
+            if ($catLines.Count -gt 0) {
+              $categories = ($catLines -join ",")
+            }
+          }
+          Write-Host "Publishing with categories: $categories"
+          "name=$($manifest.name)" >> $env:GITHUB_OUTPUT
+          "version=$($manifest.version_number)" >> $env:GITHUB_OUTPUT
+          "file=$($zip.Name)" >> $env:GITHUB_OUTPUT
+          "categories=$categories" >> $env:GITHUB_OUTPUT
+
+      - name: Publish Package to Thunderstore
+        id: ts_publish
+        continue-on-error: true
+        uses: GreenTF/upload-thunderstore-package@v4.3
+        with:
+          token: ${{ secrets.THUNDERSTORE_TOKEN }}
+          repo: https://thunderstore.io
+          community: repo
+          namespace: OsmarBriones
+          name: ${{ steps.pkg_info.outputs.name }}
+          version: ${{ steps.pkg_info.outputs.version }}
+          file: ${{ steps.pkg_info.outputs.file }}
+          categories: ${{ steps.pkg_info.outputs.categories }}
+
+      - name: Verify Publication Status
+        shell: pwsh
+        run: |
+          if ('${{ steps.ts_publish.outcome }}' -eq 'failure') {
+            Write-Warning "Thunderstore upload step reported failure. Checking if package version is already live..."
+            $pkgName = "${{ steps.pkg_info.outputs.name }}"
+            $pkgVersion = "${{ steps.pkg_info.outputs.version }}"
+            $url = "https://thunderstore.io/package/download/OsmarBriones/$pkgName/$pkgVersion/"
+            try {
+              $resp = Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing -ErrorAction Stop
+              if ($resp.StatusCode -eq 200) {
+                Write-Host "Package $pkgName v$pkgVersion is already published on Thunderstore. Release is UP-TO-DATE." -ForegroundColor Green
+                exit 0
+              }
+            } catch {
+              throw "Thunderstore publish failed and package version is not published on Thunderstore."
+            }
+          }

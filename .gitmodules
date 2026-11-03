@@ -1,0 +1,6 @@
+[submodule "external/RepoAPI"]
+	path = external/RepoAPI
+	url = https://github.com/OsmarBriones/RepoAPI.git
+[submodule "external/RepoKit"]
+	path = external/RepoKit
+	url = https://github.com/OsmarBriones/RepoKit.git

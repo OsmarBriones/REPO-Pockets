@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+
+    <RepoRootPath Condition="'$(REPO_GAME_DIR)' != ''">$(REPO_GAME_DIR)</RepoRootPath>
+    <RepoRootPath Condition="'$(RepoRootPath)' == ''">C:\Program Files (x86)\Steam\steamapps\common\REPO</RepoRootPath>
+    <RepoManaged>$(RepoRootPath)\REPO_Data\Managed</RepoManaged>
+    <RepoBepInExCore>$(RepoRootPath)\BepInEx\core</RepoBepInExCore>
+  </PropertyGroup>
+</Project>

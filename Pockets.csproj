@@ -1,0 +1,121 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Shared TargetFramework/LangVersion/Nullable/game paths come from Directory.Build.props -->
+  <PropertyGroup>
+    <RootNamespace>Pockets</RootNamespace>
+    <AssemblyName>Pockets</AssemblyName>
+    <Authors>Osmar Briones</Authors>
+    <Version>1.0.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <!-- Add Package Sources -->
+  <PropertyGroup>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json;
+      https://nuget.windows10ce.com/nuget/v3/index.json
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <!-- Package References -->
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" IncludeAssets="build" />
+    <PackageReference Include="BepInEx.Core" Version="5.*" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <!-- Submodule isolation: prevent SDK glob from including external submodules (RepoKit, RepoAPI)
+       unless explicitly included below. -->
+  <ItemGroup>
+    <Compile Remove="external\**" />
+    <EmbeddedResource Remove="external\**" />
+    <None Remove="external\**" />
+
+    <!-- When consuming RepoAPI modules (after git submodule add https://github.com/OsmarBriones/RepoAPI.git external/RepoAPI):
+    <Compile Include="external\RepoAPI\Items\ItemProvider.cs" />
+    <Compile Include="external\RepoAPI\Items\ItemKeysProvider.cs" />
+    <Compile Include="external\RepoAPI\Items\ItemName.cs" />
+    <Compile Include="external\RepoAPI\Game\**\*.cs" />
+    -->
+  </ItemGroup>
+
+  <!-- Game and Unity References -->
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>$(RepoBepInExCore)\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(RepoManaged)\Assembly-CSharp.dll</HintPath>
+      <Publicize>true</Publicize>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>$(RepoManaged)\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>$(RepoBepInExCore)\BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="PhotonUnityNetworking">
+      <HintPath>$(RepoManaged)\PhotonUnityNetworking.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(RepoManaged)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(RepoManaged)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>$(RepoManaged)\UnityEngine.PhysicsModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(RepoManaged)\UnityEngine.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- PostBuild: deploy to Steam and r2modman Debug profile (skipped when building the template itself) -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(AssemblyName)' != '$([System.String]::Concat(&quot;RepoMod&quot;, &quot;Template&quot;))'">
+    <!-- Steam plugins directory -->
+    <Exec ContinueOnError="true" Command="set DEST=&quot;$(RepoRootPath)\BepInEx\plugins&quot;&#xD;&#xA;if not exist %25DEST%25 mkdir %25DEST%25&#xD;&#xA;xcopy /Y /R /I &quot;$(TargetPath)&quot; %25DEST%25\" />
+
+    <!-- r2modman Debug profile (if present) -->
+    <PropertyGroup>
+      <R2ModmanDebugPlugins>$(APPDATA)\r2modmanPlus-local\REPO\profiles\Debug\BepInEx\plugins</R2ModmanDebugPlugins>
+    </PropertyGroup>
+    <Exec ContinueOnError="true" Command="if exist &quot;$(APPDATA)\r2modmanPlus-local\REPO\profiles\Debug&quot; (&#xD;&#xA;  if not exist &quot;$(R2ModmanDebugPlugins)&quot; mkdir &quot;$(R2ModmanDebugPlugins)&quot;&#xD;&#xA;  xcopy /Y /R /I &quot;$(TargetPath)&quot; &quot;$(R2ModmanDebugPlugins)\&quot;&#xD;&#xA;)" />
+  </Target>
+
+  <!-- Package everything into a Thunderstore-ready ZIP -->
+  <Target Name="PackThunderstore" AfterTargets="Build">
+    <PropertyGroup>
+      <ThunderstoreBuildDir>$(MSBuildProjectDirectory)\ts_build</ThunderstoreBuildDir>
+      <ThunderstoreOutDir>$(MSBuildProjectDirectory)\dist</ThunderstoreOutDir>
+      <ThunderstoreZip>$(ThunderstoreOutDir)\$(AssemblyName).zip</ThunderstoreZip>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(ThunderstoreOutDir)" />
+    <RemoveDir Directories="$(ThunderstoreBuildDir)" />
+    <MakeDir Directories="$(ThunderstoreBuildDir)" />
+
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ThunderstoreBuildDir)" />
+
+    <ItemGroup>
+      <ThunderstoreStaticFiles Include="$(MSBuildProjectDirectory)\README.md" />
+      <ThunderstoreStaticFiles Include="$(MSBuildProjectDirectory)\CHANGELOG.md" />
+      <ThunderstoreStaticFiles Include="$(MSBuildProjectDirectory)\manifest.json" />
+      <ThunderstoreStaticFiles Include="$(MSBuildProjectDirectory)\icon.png" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(ThunderstoreStaticFiles)" DestinationFolder="$(ThunderstoreBuildDir)" SkipUnchangedFiles="true" />
+    <Exec Command="powershell -NoLogo -NoProfile -Command &quot;Compress-Archive -Path '$(ThunderstoreBuildDir)\*' -DestinationPath '$(ThunderstoreZip)' -Force&quot;" />
+  </Target>
+
+</Project>

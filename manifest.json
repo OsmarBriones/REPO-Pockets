@@ -1,0 +1,9 @@
+{
+    "name":  "Pockets",
+    "version_number":  "1.0.0",
+    "website_url":  "https://github.com/OsmarBriones/Pockets",
+    "description":  "Store valuables in your inventory slots and take them out again. Tiny valuables by default, configurable up to any size. Requires all players (Host and Clients) to install.",
+    "dependencies":  [
+                         "BepInEx-BepInExPack-5.4.2304"
+                     ]
+}
