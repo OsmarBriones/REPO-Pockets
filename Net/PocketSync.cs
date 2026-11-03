@@ -1,5 +1,6 @@
 using Pockets.Api;
 using Pockets.Domain;
+using UnityEngine;
 
 namespace Pockets.Net;
 
@@ -11,6 +12,39 @@ internal static class PocketSync
 	{
 		return SizePolicy.TryFromGameVolume((int)valuable.volumeType, out PocketSize size)
 			&& SizePolicy.Accepts(size, ConfigurationController.MaxValuableSize);
+	}
+
+	/// <summary>Validates a release request from a player: it must be theirs, and the drop spot must be near them.</summary>
+	internal static bool CanRelease(PocketedValuable pocketed, int slot, int playerKey, Vector3 position, PlayerAvatar? avatar, float maxDistanceFromPlayer, out string reason)
+	{
+		if (avatar == null)
+		{
+			reason = "unknown player";
+			return false;
+		}
+
+		if (avatar.isDisabled || avatar.deadSet)
+		{
+			reason = "the player is dead or disabled";
+			return false;
+		}
+
+		if (!pocketed.IsPocketed || pocketed.PlayerKey != playerKey || pocketed.Slot != slot)
+		{
+			reason = "the valuable is not in that player's slot";
+			return false;
+		}
+
+		bool finite = !float.IsNaN(position.x) && !float.IsNaN(position.y) && !float.IsNaN(position.z)
+			&& !float.IsInfinity(position.x) && !float.IsInfinity(position.y) && !float.IsInfinity(position.z);
+		if (!finite || Vector3.Distance(position, avatar.transform.position) > maxDistanceFromPlayer)
+		{
+			reason = "the drop position is invalid or too far from the player";
+			return false;
+		}
+
+		reason = string.Empty;
+		return true;
 	}
 
 	/// <summary>Validates a store request. <paramref name="reason"/> explains a refusal, for logging.</summary>

@@ -7,8 +7,8 @@ namespace Pockets.Patches;
 
 /// <summary>
 /// Intercepts the slot key. Holding an eligible valuable and pressing a free slot stores it; pressing a
-/// pocketed slot never reaches vanilla (whose unequip path would fail on a slot without an item).
-/// Releasing a stored valuable is added with the release flow.
+/// pocketed slot takes its valuable out and never reaches vanilla (whose unequip path would fail on a
+/// slot without an item).
 /// </summary>
 [HarmonyPatch(typeof(InventorySpot), "HandleInput")]
 internal static class InventorySpot_HandleInput_Patch
@@ -35,6 +35,17 @@ internal static class InventorySpot_HandleInput_Patch
 		PlayerPockets? pockets = PocketsApi.Find(playerKey);
 		if (pockets != null && pockets.State.IsOccupied(spot))
 		{
+			// A pocketed slot never reaches vanilla; the key takes the valuable out.
+			if (CanSendRequest())
+			{
+				ValuableObject? stored = pockets.Valuables[spot];
+				PocketedValuable? pocketed = stored != null ? stored.GetComponent<PocketedValuable>() : null;
+				if (pocketed != null)
+				{
+					pocketed.RequestRelease();
+				}
+			}
+
 			return false;
 		}
 
@@ -49,14 +60,24 @@ internal static class InventorySpot_HandleInput_Patch
 			return true;
 		}
 
+		if (CanSendRequest())
+		{
+			held.RequestStore(spot);
+		}
+
+		return false;
+	}
+
+	/// <summary>Rate-limits slot-key requests; also consumes the attempt when it passes.</summary>
+	private static bool CanSendRequest()
+	{
 		if (PlayerController.instance.InputDisableTimer > 0f || Time.time - lastRequestTime < RequestCooldownSeconds)
 		{
 			return false;
 		}
 
 		lastRequestTime = Time.time;
-		held.RequestStore(spot);
-		return false;
+		return true;
 	}
 
 	private static PocketedValuable? HeldValuable()

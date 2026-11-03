@@ -70,8 +70,10 @@ description: "Task list for the Pockets storage feature"
 
 **Goal**: User Story 2
 
-- [ ] T021 [US2] Implement the release flow in `Net/PocketSync.cs` and `Net/PocketedValuable.cs`: raycast position as in `ItemEquippable.RayHitTestNew` (stay out of walls), restore scale, colliders, mass and physics, free the slot, and **auto-grab the valuable for the player for about 1.5 s** like `ItemEquippable.ForceGrab` (research S1)
-- [ ] T022 [US2] Add the release branch to `Patches/InventorySpot_HandleInput_Patch.cs`
+**Status**: implemented and compiling (0 warnings), not yet tested in the game. The `inStartRoom` reset from research S5 was left out because vanilla re-adds the valuable by itself.
+
+- [x] T021 [US2] Implement the release flow in `Net/PocketSync.cs` and `Net/PocketedValuable.cs`: raycast position as in `ItemEquippable.RayHitTestNew` (stay out of walls), restore scale, colliders, mass and physics, free the slot, and **auto-grab the valuable for the player for about 1.5 s** like `ItemEquippable.ForceGrab` (research S1)
+- [x] T022 [US2] Add the release branch to `Patches/InventorySpot_HandleInput_Patch.cs`
 
 ---
 
