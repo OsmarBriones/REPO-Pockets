@@ -87,7 +87,7 @@ Noted as they happened, with the verdict of the filter in `external/RepoKit/refe
 | Candidate | Verdict |
 |-----------|---------|
 | Singleplayer view ids are all 0 (found while reading logs, would have mixed valuables up) | Added as P-003 |
-| A running game blocks the DLL copy, so tests used stale code | Added as P-004 |
+| A running game can block the DLL copy or keep old code loaded, so tests may use stale code (the copy did not fail every time, which the first wording missed) | Added as P-004, reworded |
 | A hidden valuable inside an extraction room can reach the haul list | Added as P-005 |
 | The Sunstone update added 6 Tiny valuables that the concept's 29-item table did not know | Added as P-006 |
 | Disabling the mod mid-session left valuables stuck in hidden pockets and lost anything stored in that slot afterwards (found by the developer) | Added as P-007 |
