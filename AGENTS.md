@@ -8,10 +8,12 @@ for .NET Framework 4.8.
 
 - This repository must remain usable after a normal clone. Do not require its
   parent workspace for normal builds or documentation.
-- Build with `dotnet build Pockets.csproj`. The post-build deployment
-  target is conditioned to skip execution when `AssemblyName` is `Pockets`
-  to prevent deploying the template into game installations; mods scaffolded from
-  the template will deploy to Steam and r2modman Debug profile normally.
+- Build with `dotnet build Pockets.csproj`. The post-build step copies `Pockets.dll`
+  to the Steam plugins folder and to the r2modman `Debug` profile. Close the game first:
+  a running game locks the DLL and the copy fails (known pitfall P-004). Debug and Release
+  both deploy, so the last build wins.
+- Tests: `dotnet test Pockets.Tests/Pockets.Tests.csproj` (Tier 1 logic and Tier 2 game contract).
+- Developer-only tools, off by default: `Debug.EnableSpikes` (hotkeys F6-F9) and `Debug.EnableIconBake` (F10).
 - Configuration and paths:
   - Game paths and target framework are configured in `Directory.Build.props`.
   - Override the default Steam path if needed with the `REPO_GAME_DIR` environment variable.

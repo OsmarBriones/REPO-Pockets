@@ -22,7 +22,7 @@ Generated from `spec.md`, `plan.md`, `ARCHITECTURE.md`, the configuration and th
 - [x] Take one out: it appears in front of you, in your hands (log: `Released ...`).
 - [x] The slot shows the valuable's picture; the value reads on one line (`$600`, `$2.8K`).
 - [ ] Optional (spike S5 already confirmed the haul list behavior with the prototype code): store a valuable inside the extraction zone and let the extraction finish: it is not counted. Take it out inside the zone: it is counted again. Cover it in a normal run rather than as a separate test.
-- [ ] Level change: end a level with a valuable in a pocket; in the next level the slot is empty and the valuable is gone.
+- [x] Level change: end a level with a valuable in a pocket; in the next level the slot is empty and the valuable is gone.
 
 ### C. Configuration
 - [ ] `ShowSlotValue = false`: the slot shows only the picture.
@@ -36,7 +36,7 @@ Generated from `spec.md`, `plan.md`, `ARCHITECTURE.md`, the configuration and th
 - [ ] Equip a vanilla item in a free slot, then store valuables in the others; both keep working.
 - [ ] Known pitfall P-002: equip a vanilla item that has a battery bar in a slot, unequip it, then store a valuable in that same slot: the slot shows no battery bars.
 - [ ] With a valuable pocketed in slot 1, hold an item and press key 1: the item is not equipped there.
-- [ ] Die with valuables in your pockets (`DropOnDeath = true`): they drop where you fell and can be picked up.
+- [x] Die with valuables in your pockets (`DropOnDeath = true`): they drop where you fell and can be picked up.
 - [ ] Drop a valuable into a death pit, a cart or the extraction machine, then try to store another: no errors.
 
 ### E. Multiplayer (needs a second player; closes spikes S2, S3, S4)
@@ -49,6 +49,6 @@ Generated from `spec.md`, `plan.md`, `ARCHITECTURE.md`, the configuration and th
 - [ ] The client dies with valuables: they drop where the client fell.
 
 ### F. Log audit
-- [ ] `Pockets 1.0.0 loaded!` at startup.
-- [ ] `Icon for <name>: packaged` for every stored valuable type (never `rendered` or `generic` for the base game's valuables).
-- [ ] No `Exception`, `NullReference` or `Could not register ... ignoring the store` lines after a full session.
+- [x] `Pockets 1.0.0 loaded!` at startup.
+- [x] `Icon for <name>: packaged` for every stored valuable type (never `rendered` or `generic` for the base game's valuables).
+- [x] No `Exception`, `NullReference` or `Could not register ... ignoring the store` lines after a full session.
