@@ -122,6 +122,18 @@ Exact signatures are confirmed in Tier 2 reflection tests; if a target changes w
 | S4 | `clientNonKinematic` on Tiny/Small: who simulates the object while hidden? | Prevents the hidden object from drifting or colliding. | Force kinematic on store, restore on release; verify on a client. |
 | S5 | Does anything else iterate valuables and dereference colliders or renderers (e.g. `ValuableDirector`, `RoundDirector`, extraction tracking)? | Hidden objects might throw. | Grep and smoke test with a pocketed valuable during extraction. |
 
+## Known Pitfalls Check
+
+Against `external/RepoKit/references/known-pitfalls.md`.
+
+| Entry | Relevant? | Safeguard or reason |
+|-------|-----------|---------------------|
+| P-001 Mod-spawned items grow the item lists | No | Pockets spawns nothing and never writes to `StatsManager`; valuables are scene objects that disappear with the level, so there is no persistent list to grow. |
+| P-002 Shop items inherit a battery | Partly | No items or batteries are created. The only touchpoint is the slot's battery display: a pocketed slot stays in vanilla's `Empty` state, so no battery bars show. Verify in game that a slot that held a battery item and then a pocketed valuable shows no bars (QA battery, section D). |
+| P-003 Singleplayer view ids are 0 | Yes | `PocketedValuable.Key` uses the view id only in multiplayer and the Unity instance id in singleplayer; unit tests accept 0 and negative keys. |
+| P-004 A running game locks the deployed DLL | Yes (workflow) | Close the game before building and compare the deployed DLL with the build output before asking for an in-game test. |
+| P-005 Hidden objects and extraction rooms | Yes | Haul list entry removed on store, `AddToDollarHaulList` guarded, store refused when `committedToExtraction`; confirmed with the spike tools (research S5). |
+
 ## Constitution Check
 
 - [x] **I. RepoKit Alignment**: complies with `REPO_MODS_WORKSPACE.md` and `REPO_MODS_METHODOLOGY.md`; repository named `REPO-Pockets`, package `Pockets`.

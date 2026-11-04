@@ -34,6 +34,7 @@ Generated from `spec.md`, `plan.md`, `ARCHITECTURE.md`, the configuration and th
 - [ ] Hold a valuable against a wall, store it, take it out: it appears in front of the wall, not inside.
 - [ ] All three slots full: a fourth valuable is not stored.
 - [ ] Equip a vanilla item in a free slot, then store valuables in the others; both keep working.
+- [ ] Known pitfall P-002: equip a vanilla item that has a battery bar in a slot, unequip it, then store a valuable in that same slot: the slot shows no battery bars.
 - [ ] With a valuable pocketed in slot 1, hold an item and press key 1: the item is not equipped there.
 - [ ] Die with valuables in your pockets (`DropOnDeath = true`): they drop where you fell and can be picked up.
 - [ ] Drop a valuable into a death pit, a cart or the extraction machine, then try to store another: no errors.
