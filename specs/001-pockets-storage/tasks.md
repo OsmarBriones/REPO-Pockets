@@ -19,7 +19,7 @@ description: "Task list for the Pockets storage feature"
 
 - [x] T001 Remove the template placeholder `Patches/EnemyDirector_Start_Patch.cs` and any reference to it in `PocketsPlugin.cs`
 - [x] T002 Add the Unity UI, TextMeshPro and Photon assembly references (`Private=false`) to `Pockets.csproj`; keep `Compile Remove="external\**"` and do not include RepoAPI modules
-- [ ] T003 [P] Create the folder skeleton from the plan: `Configuration/`, `Domain/`, `Net/`, `Ui/`, `Api/`, `Patches/`
+- [x] T003 [P] Create the folder skeleton from the plan: `Configuration/`, `Domain/`, `Net/`, `Ui/`, `Api/`, `Patches/`
 - [x] T004 [P] Create `Pockets.Tests/` (MSTest) following the layout used by the other mods; Tier 1 and Tier 2 live here
 
 ---
@@ -61,7 +61,7 @@ description: "Task list for the Pockets storage feature"
 - [x] T019 [US1] Implement `Patches/InventorySpot_Occupied_Patch.cs` so vanilla never equips into a pocketed slot
 - [x] T020 [US1] Implement `Patches/ValuableObject_AddToDollarHaulList_Patch.cs`, remove an already listed valuable from the haul list on store, and reset `inStartRoom` on release so it can be re-added inside an extraction room (haul leak; see research S5)
 
-- [ ] T034 [US4] Make `MaxValuableSize` and `DropOnDeath` host-authoritative: clients use the host's values, sent on join and when the host changes them
+- [x] T034 [US4] Make `MaxValuableSize` and `DropOnDeath` host-authoritative: clients use the host's values, sent on join and when the host changes them
 - [x] T035 [US1] Choose the valuable key in the integration layer: PhotonView id in multiplayer, `GetInstanceID()` in singleplayer (every valuable's view id is 0 there, see research S1)
 
 ---
@@ -81,8 +81,8 @@ description: "Task list for the Pockets storage feature"
 
 **Goal**: User Story 3
 
-- [ ] T023 [US3] Implement `Ui/PocketSlotView.cs` (generated icon sprite and a cloned TMP label for the value)
-- [ ] T024 [US3] Implement `Patches/InventorySpot_UI_Patch.cs` (`UpdateUI` and throttled `Update` postfixes, honoring `ShowSlotValue`)
+- [x] T023 [US3] Implement `Ui/PocketSlotView.cs` (generated icon sprite and a cloned TMP label for the value)
+- [x] T024 [US3] Implement `Patches/InventorySpot_UI_Patch.cs` (`UpdateUI` and throttled `Update` postfixes, honoring `ShowSlotValue`)
 
 ---
 
@@ -90,10 +90,10 @@ description: "Task list for the Pockets storage feature"
 
 **Goal**: User Story 4 and the lifecycle edge cases
 
-- [ ] T025 [US4] Implement `Patches/PlayerAvatar_PlayerDeath_Patch.cs`: raise the cancelable `PlayerDying` event, then drop pockets at the player's position when `DropOnDeath` is on
+- [x] T025 [US4] Implement `Patches/PlayerAvatar_PlayerDeath_Patch.cs`: raise the cancelable `PlayerDying` event, then drop pockets at the player's position when `DropOnDeath` is on
 - [x] T026 [US4] Clear all pocket state on level start so nothing persists across levels
-- [ ] T027 [US4] Sync the full pocket state to late joiners using the mechanism chosen in T009
-- [ ] T028 [US4] Drop a player's pockets when they disconnect
+- [x] T027 [US4] Sync the full pocket state to late joiners (implemented as a targeted resend of the store RPC by the master, no player properties needed; untested with a second player)
+- [x] T028 [US4] Drop a player's pockets when they disconnect
 
 ---
 
@@ -101,10 +101,10 @@ description: "Task list for the Pockets storage feature"
 
 **Purpose**: Quality assurance, zero-warning compilation and documentation
 
-- [ ] T029 Tier 2: reflection contract tests for every Harmony target in the plan (`InventorySpot.HandleInput`, `IsOccupied`, `UpdateUI`, `Update`, `ValuableObject.Start`, `AddToDollarHaulList`, `PlayerAvatar.PlayerDeath`)
-- [ ] T030 Build `dotnet build -c Debug` and `-c Release` with **0 warnings and 0 errors**
-- [ ] T031 [P] Create `ARCHITECTURE.md` (pocket layer, RPC flow, hooks, API) and update `README.md` and `CHANGELOG.md` under `[Unreleased]` (no version bump)
-- [ ] T032 [P] Record the RepoAPI reuse decision (nothing generic yet; S2 helper as a promotion candidate) in the completion summary and, if kept in the mod, in `RepoAPI/README.md`
+- [x] T029 Tier 2: reflection contract tests for every Harmony target in the plan (`InventorySpot.HandleInput`, `IsOccupied`, `UpdateUI`, `Update`, `ValuableObject.Start`, `AddToDollarHaulList`, `PlayerAvatar.PlayerDeath`)
+- [x] T030 Build `dotnet build -c Debug` and `-c Release` with **0 warnings and 0 errors**
+- [x] T031 [P] Create `ARCHITECTURE.md` (pocket layer, RPC flow, hooks, API) and update `README.md` and `CHANGELOG.md` under `[Unreleased]` (no version bump)
+- [x] T032 [P] Record the RepoAPI reuse decision (nothing generic yet; S2 helper as a promotion candidate) in the completion summary and, if kept in the mod, in `RepoAPI/README.md`
 - [ ] T033 Tier 3 smoke testing in the r2modman Debug profile with a second client (use the `generate-test-battery` skill): store, release, extraction with a pocketed valuable, death, late join, level change
 
 ---

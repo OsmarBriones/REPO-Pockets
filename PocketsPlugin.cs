@@ -1,5 +1,6 @@
 using BepInEx;
 using HarmonyLib;
+using Pockets.Net;
 using Pockets.Spikes;
 using UnityEngine;
 
@@ -24,6 +25,8 @@ namespace Pockets
 			this.gameObject.hideFlags = HideFlags.HideAndDontSave;
 
 			ConfigurationController.Initialize(this.Config);
+
+			this.gameObject.AddComponent<PocketsRoomEvents>();
 
 			if (ConfigurationController.SpikesEnabled)
 			{

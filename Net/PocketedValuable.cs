@@ -166,6 +166,15 @@ internal sealed class PocketedValuable : MonoBehaviourPun
 		RefreshLocalSlot(playerKey, slot);
 	}
 
+	/// <summary>Master only: tells a player who just joined that this valuable is in a pocket, so they hide it too.</summary>
+	internal void SendStateTo(Photon.Realtime.Player target, int playerKey, int slot)
+	{
+		if (SemiFunc.IsMultiplayer() && IsPocketed)
+		{
+			photonView.RPC(nameof(StoredRpc), target, playerKey, slot);
+		}
+	}
+
 	// ---- Release ----
 
 	/// <summary>Called by the local player's slot key. Picks a spot in front of the camera and asks the master to release this valuable.</summary>
@@ -267,7 +276,8 @@ internal sealed class PocketedValuable : MonoBehaviourPun
 		PocketsApi.RaiseRemoved(new PocketEvent(playerKey, slot, valuableKey, valuable));
 		RefreshLocalSlot(playerKey, slot);
 
-		if (playerKey == PlayerKeys.Local())
+		PlayerAvatar? localAvatar = PlayerAvatar.instance;
+		if (playerKey == PlayerKeys.Local() && localAvatar != null && !localAvatar.deadSet)
 		{
 			StartCoroutine(AutoGrab());
 		}

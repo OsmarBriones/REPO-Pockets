@@ -1,52 +1,49 @@
 # Pockets
 
-[Short 1-2 sentence description of what the mod brings to the player's game. Example: "Adds customizable duck spawns across the facility to bring joy and chaos to your salvage runs."]
+Keep valuables in your inventory slots and take them out again whenever you want. Small valuables by default, any size if you prefer.
 
-Only the host needs to have this mod installed â€” other players see the effects automatically without installing anything.
+> **Everyone in the lobby must install this mod.** Storing a valuable uses each player's own inventory keys and slot display, so friends without it would see an empty slot and could not use the pockets.
 
 ## Preview
 
-<!-- Visual gameplay demo GIF (auto-configured by RepoKit tools or placed in assets/preview.gif) -->
+<!-- Visual gameplay demo GIF (placed in assets/preview.gif) -->
 ![Gameplay Preview](https://raw.githubusercontent.com/OsmarBriones/REPO-Pockets/master/assets/preview.gif)
 
 ## How to Use
 
-1. **Quick Start**: Explain how the player starts using or finds the mod content in-game.
-2. **Controls / Triggers**: Explain the key bindings or player actions (e.g. Press `E` to toggle).
-3. **Feedback**: Describe how the player knows the mod is active (HUD prompt, sound, or visual cue).
+1. **Store:** grab a small valuable and press the key of a free inventory slot (the same keys you use for your items). It disappears into your pocket.
+2. **Take it out:** press the same slot key again. The valuable appears in front of you and ends up in your hands.
+3. **Check it:** the slot shows a picture of the valuable and, if you like, its current value.
 
 ## Features
 
-<!--
-  PLAYER-FACING FEATURES GUIDELINE:
-  This section is for players on Thunderstore and mod managers.
-  - Describe gameplay mechanics, effects, audiovisual feedback, and player experience.
-  - Highlight multiplayer behavior in plain language (e.g., host-only installation).
-  - DO NOT include Unity engine terms, hook/patch target names (e.g., EnemyDirector, TruckSafetySpawnPoint),
-    Harmony methods, or internal code architecture here (put those in ARCHITECTURE.md).
--->
-
-- **Exciting Gameplay Mechanic**: Explain what players experience in-game.
-- **Dynamic Facility Effects**: Describe the in-game behavior and balance.
-- **Host-Only Multiplayer**: Only the host needs the mod installed; effects are fully synchronized for all players in the lobby.
-- **Customizable Experience**: Adjust settings via the configuration file to tune the mod to your liking.
+- **Pocket your loot:** carry valuables hands-free and keep them safe while you deal with monsters or move heavy things.
+- **Same keys as your items:** no new controls; a pocketed valuable uses one of your inventory slots, so it competes with your tools and weapons.
+- **A picture of each valuable:** every valuable has its own little image on the slot, plus its current value (you can turn the value off).
+- **Fair to extraction:** a valuable in your pocket does not count toward the haul until you take it out and deliver it.
+- **Nothing carries over:** valuables in your pockets are lost when the level ends.
+- **If you die or leave:** your pocketed valuables drop where you fell or where you left.
+- **Choose what fits:** by default only the smallest valuables fit; the host can allow bigger ones.
 
 ## Requirements
 - [BepInEx Pack for R.E.P.O.](https://thunderstore.io/c/repo/p/BepInEx/BepInExPack/)
 
 ## Installation
 1. Install the latest [BepInEx Pack](https://thunderstore.io/c/repo/p/BepInEx/BepInExPack/).
-2. Place `Pockets.dll` into your `BepInEx/plugins` folder (or install via r2modman / Thunderstore Mod Manager).
-3. Launch the game once â€” the configuration file will be generated automatically inside `BepInEx/config`.
+2. Install through r2modman / Thunderstore Mod Manager, or place `Pockets.dll` in your `BepInEx/plugins` folder. **All players need it.**
+3. Launch the game once; the configuration file is created inside `BepInEx/config`.
 
 ## Configuration
-All settings are controlled through the generated file: `com.osmar.Pockets.cfg` located in `BepInEx/config`.
+All settings are in `com.osmar.Pockets.cfg` inside `BepInEx/config`.
 
-- `ExampleSetting` (default `3`): Describe the gameplay effect of this option in plain words.
+- `Enabled` (default `true`): turn the mod on or off.
+- `MaxValuableSize` (default `Tiny`): the biggest valuable that fits in a pocket. Every smaller size fits too (Tiny, Small, Medium, Big, Wide, Tall, VeryTall). The host's choice applies to everyone.
+- `DropOnDeath` (default `true`): drop your pocketed valuables where you die. The host's choice applies to everyone.
+- `ShowSlotValue` (default `true`): show the stored valuable's value on its slot. Mods that depend on the value turn it on regardless.
 
 ## Issues & Bug Reports
 The official way to report issues, suggest improvements, or submit feedback is by opening an issue on the official GitHub repository:
-ðŸ‘‰ [GitHub Issues](https://github.com/OsmarBriones/REPO-Pockets/issues)
+👉 [GitHub Issues](https://github.com/OsmarBriones/REPO-Pockets/issues)
 
 ## Credits
 Developed by **Osmar Briones**

@@ -13,6 +13,7 @@ namespace Pockets.Api;
 public static class PocketsApi
 {
 	private static readonly Dictionary<int, PlayerPockets> Players = new Dictionary<int, PlayerPockets>();
+	private static readonly HashSet<string> SlotValueRequirements = new HashSet<string>();
 
 	/// <summary>Raised after a valuable has been stored in a pocket.</summary>
 	public static event Action<PocketEvent>? Stored;
@@ -22,6 +23,33 @@ public static class PocketsApi
 
 	/// <summary>Raised before a dying player's valuables are dropped; set <see cref="PlayerDyingEventArgs.Cancel"/> to handle them yourself.</summary>
 	public static event Action<PlayerDyingEventArgs>? PlayerDying;
+
+	/// <summary>
+	/// Makes the stored valuable's value always visible on the slot, overriding the player's <c>ShowSlotValue</c> setting.
+	/// Mods that give meaning to the value (TalismanCore) call this once at startup with their own id.
+	/// </summary>
+	public static void RequireSlotValue(string requesterId)
+	{
+		if (!string.IsNullOrEmpty(requesterId))
+		{
+			SlotValueRequirements.Add(requesterId);
+		}
+	}
+
+	/// <summary>Withdraws a requirement made with <see cref="RequireSlotValue"/>.</summary>
+	public static void ReleaseSlotValueRequirement(string requesterId)
+	{
+		SlotValueRequirements.Remove(requesterId);
+	}
+
+	/// <summary>True while some mod requires the value to be shown.</summary>
+	internal static bool SlotValueRequired => SlotValueRequirements.Count > 0;
+
+	/// <summary>A copy of every registered player's pockets, safe to iterate while pockets change.</summary>
+	internal static List<KeyValuePair<int, PlayerPockets>> Snapshot()
+	{
+		return new List<KeyValuePair<int, PlayerPockets>>(Players);
+	}
 
 	/// <summary>The valuables currently stored by a player, one entry per slot (null for a free slot or a valuable not loaded here).</summary>
 	public static IReadOnlyList<ValuableObject?> GetStored(int playerKey)

@@ -1,4 +1,9 @@
 # Changelog
 
-## 1.0.0
-- First release!
+## [Unreleased]
+- Store a held valuable in a free inventory slot with the slot key, and take it out with the same key (it ends up in your hands).
+- A picture of each valuable (198 packaged icons) and its current value on the slot; `ShowSlotValue` turns the value off.
+- Valuables in a pocket are kept out of the extraction haul list and are lost when the level ends.
+- `MaxValuableSize` (default Tiny) and `DropOnDeath` are decided by the host; pocketed valuables drop when their owner dies or leaves.
+- Public API for other mods (`PocketsApi`): read pockets, store and remove events, a cancelable death event and a way to require the slot value.
+- Tier 1 and Tier 2 tests, and developer-only tools (spike hotkeys and an icon baker) that are off by default.

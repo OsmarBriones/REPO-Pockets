@@ -1,5 +1,6 @@
 using HarmonyLib;
 using Pockets.Api;
+using Pockets.Net;
 
 namespace Pockets.Patches;
 
@@ -20,5 +21,6 @@ internal static class EnemyDirector_Start_Patch
 
 		ConfigurationController.Reload();
 		PocketsApi.ClearAll();
+		HostSettings.Publish();
 	}
 }
