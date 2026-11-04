@@ -21,7 +21,7 @@ Generated from `spec.md`, `plan.md`, `ARCHITECTURE.md`, the configuration and th
 - [x] Store a Tiny valuable in each of the three slots (log: `Stored ... in slot N`).
 - [x] Take one out: it appears in front of you, in your hands (log: `Released ...`).
 - [x] The slot shows the valuable's picture; the value reads on one line (`$600`, `$2.8K`).
-- [ ] Extraction: store a valuable that was inside the extraction zone, run the extraction: it is not counted. Take it out inside the zone: it is counted again.
+- [ ] Optional (spike S5 already confirmed the haul list behavior with the prototype code): store a valuable inside the extraction zone and let the extraction finish: it is not counted. Take it out inside the zone: it is counted again. Cover it in a normal run rather than as a separate test.
 - [ ] Level change: end a level with a valuable in a pocket; in the next level the slot is empty and the valuable is gone.
 
 ### C. Configuration
