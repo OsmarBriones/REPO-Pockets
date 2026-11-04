@@ -65,7 +65,7 @@ internal sealed class PocketSlotView : MonoBehaviour
 
 	private ValuableObject? CurrentValuable()
 	{
-		if (spot == null || !ConfigurationController.IsEnabled || !SemiFunc.RunIsLevel())
+		if (spot == null || !SemiFunc.RunIsLevel())
 		{
 			return null;
 		}

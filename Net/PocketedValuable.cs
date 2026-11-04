@@ -178,7 +178,9 @@ internal sealed class PocketedValuable : MonoBehaviourPun
 	// ---- Release ----
 
 	/// <summary>Called by the local player's slot key. Picks a spot in front of the camera and asks the master to release this valuable.</summary>
-	internal void RequestRelease()
+	/// <param name="autoGrab">Put the valuable in the player's hands after taking it out (the normal key press).</param>
+	/// <param name="spread">Sideways offset in steps, so several valuables released together do not pile up.</param>
+	internal void RequestRelease(bool autoGrab = true, int spread = 0)
 	{
 		PlayerAvatar? avatar = PlayerAvatar.instance;
 		if (avatar == null || !IsPocketed || PlayerKey != PlayerKeys.Of(avatar))
@@ -186,19 +188,19 @@ internal sealed class PocketedValuable : MonoBehaviourPun
 			return;
 		}
 
-		ComputeReleasePose(out Vector3 position, out Quaternion rotation);
+		ComputeReleasePose(spread, out Vector3 position, out Quaternion rotation);
 		if (SemiFunc.IsMultiplayer())
 		{
-			photonView.RPC(nameof(RequestReleaseRpc), RpcTarget.MasterClient, Slot, PlayerKey, position, rotation);
+			photonView.RPC(nameof(RequestReleaseRpc), RpcTarget.MasterClient, Slot, PlayerKey, position, rotation, autoGrab);
 		}
 		else
 		{
-			ProcessReleaseRequest(Slot, PlayerKey, position, rotation);
+			ProcessReleaseRequest(Slot, PlayerKey, position, rotation, autoGrab);
 		}
 	}
 
 	[PunRPC]
-	private void RequestReleaseRpc(int slot, int playerKey, Vector3 position, Quaternion rotation, PhotonMessageInfo info = default)
+	private void RequestReleaseRpc(int slot, int playerKey, Vector3 position, Quaternion rotation, bool autoGrab, PhotonMessageInfo info = default)
 	{
 		if (!SemiFunc.IsMasterClient())
 		{
@@ -211,10 +213,10 @@ internal sealed class PocketedValuable : MonoBehaviourPun
 			return;
 		}
 
-		ProcessReleaseRequest(slot, playerKey, position, rotation);
+		ProcessReleaseRequest(slot, playerKey, position, rotation, autoGrab);
 	}
 
-	private void ProcessReleaseRequest(int slot, int playerKey, Vector3 position, Quaternion rotation)
+	private void ProcessReleaseRequest(int slot, int playerKey, Vector3 position, Quaternion rotation, bool autoGrab)
 	{
 		PlayerAvatar? avatar = PlayerKeys.Resolve(playerKey);
 		if (!PocketSync.CanRelease(this, slot, playerKey, position, avatar, MaxReleaseDistanceFromPlayer, out string reason))
@@ -223,34 +225,34 @@ internal sealed class PocketedValuable : MonoBehaviourPun
 			return;
 		}
 
-		BroadcastRelease(slot, playerKey, position, rotation);
+		BroadcastRelease(slot, playerKey, position, rotation, autoGrab);
 	}
 
 	/// <summary>Master only: releases this valuable at the given pose on every client.</summary>
-	internal void BroadcastRelease(int slot, int playerKey, Vector3 position, Quaternion rotation)
+	internal void BroadcastRelease(int slot, int playerKey, Vector3 position, Quaternion rotation, bool autoGrab)
 	{
 		if (SemiFunc.IsMultiplayer())
 		{
-			photonView.RPC(nameof(ReleasedRpc), RpcTarget.All, playerKey, slot, position, rotation);
+			photonView.RPC(nameof(ReleasedRpc), RpcTarget.All, playerKey, slot, position, rotation, autoGrab);
 		}
 		else
 		{
-			ApplyReleased(playerKey, slot, position, rotation);
+			ApplyReleased(playerKey, slot, position, rotation, autoGrab);
 		}
 	}
 
 	[PunRPC]
-	private void ReleasedRpc(int playerKey, int slot, Vector3 position, Quaternion rotation, PhotonMessageInfo info = default)
+	private void ReleasedRpc(int playerKey, int slot, Vector3 position, Quaternion rotation, bool autoGrab, PhotonMessageInfo info = default)
 	{
 		if (!SemiFunc.MasterOnlyRPC(info))
 		{
 			return;
 		}
 
-		ApplyReleased(playerKey, slot, position, rotation);
+		ApplyReleased(playerKey, slot, position, rotation, autoGrab);
 	}
 
-	private void ApplyReleased(int playerKey, int slot, Vector3 position, Quaternion rotation)
+	private void ApplyReleased(int playerKey, int slot, Vector3 position, Quaternion rotation, bool autoGrab)
 	{
 		PlayerPockets? pockets = PocketsApi.Find(playerKey);
 		if (!IsPocketed || PlayerKey != playerKey || Slot != slot || pockets == null || !pockets.State.TryRelease(slot, out _))
@@ -277,14 +279,14 @@ internal sealed class PocketedValuable : MonoBehaviourPun
 		RefreshLocalSlot(playerKey, slot);
 
 		PlayerAvatar? localAvatar = PlayerAvatar.instance;
-		if (playerKey == PlayerKeys.Local() && localAvatar != null && !localAvatar.deadSet)
+		if (autoGrab && playerKey == PlayerKeys.Local() && localAvatar != null && !localAvatar.deadSet)
 		{
 			StartCoroutine(AutoGrab());
 		}
 	}
 
 	/// <summary>A spot in front of the camera that stays out of walls, like <c>ItemEquippable.RayHitTestNew</c>.</summary>
-	private void ComputeReleasePose(out Vector3 position, out Quaternion rotation)
+	private void ComputeReleasePose(int spread, out Vector3 position, out Quaternion rotation)
 	{
 		Camera? camera = Camera.main;
 		if (camera == null)
@@ -300,6 +302,7 @@ internal sealed class PocketedValuable : MonoBehaviourPun
 		position = Physics.Raycast(view.position, view.forward, out RaycastHit hit, ReleaseDistance, mask)
 			? hit.point + hit.normal * releaseOffset
 			: view.position + view.forward * ReleaseDistance;
+		position += view.right * (spread * 0.25f);
 	}
 
 	/// <summary>Keeps grabbing the valuable for a moment after taking it out, like <c>ItemEquippable.ForceGrab</c>, so it ends up in the player's hands.</summary>

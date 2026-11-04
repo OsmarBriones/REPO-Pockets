@@ -20,7 +20,7 @@ internal static class InventorySpot_HandleInput_Patch
 	[HarmonyPrefix]
 	private static bool Prefix(InventorySpot __instance)
 	{
-		if (!ConfigurationController.IsEnabled || !SemiFunc.RunIsLevel())
+		if (!SemiFunc.RunIsLevel())
 		{
 			return true;
 		}
@@ -49,7 +49,8 @@ internal static class InventorySpot_HandleInput_Patch
 			return false;
 		}
 
-		if (__instance.IsOccupied())
+		// Taking out always works; storing needs the mod enabled.
+		if (!ConfigurationController.IsEnabled || __instance.IsOccupied())
 		{
 			return true;
 		}

@@ -43,6 +43,9 @@ Why a parallel layer: the vanilla inventory only accepts `ItemEquippable` items;
 3. The master checks ownership and that the spot is near the player, then broadcasts `ReleasedRpc`.
 4. Every client restores the valuable; the master teleports it to the spot; the owner auto-grabs it for 1.5 s (like `ItemEquippable.ForceGrab`).
 
+### Switching the mod off
+- `Enabled` is only a gate for storing. When it turns off (config menu or reload), `PocketReleaser` drops the local player's stored valuables side by side in front of them (not grabbed), through the normal release path, so nothing is left hidden. Taking out, the occupied-slot display and the slot picture keep working regardless, as a safety net.
+
 ### Death, disconnect, level change
 - **Death:** after vanilla accepts `PlayerDeathRPC`, the master raises `PocketsApi.PlayerDying`. A subscriber can cancel it to handle the valuables itself (the Phone talisman); otherwise, with `DropOnDeath`, they are released where the player fell.
 - **Disconnect:** the master releases the leaver's valuables where they were hidden.

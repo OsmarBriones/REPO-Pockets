@@ -6,4 +6,5 @@
 - Valuables in a pocket are kept out of the extraction haul list and are lost when the level ends.
 - `MaxValuableSize` (default Tiny) and `DropOnDeath` are decided by the host; pocketed valuables drop when their owner dies or leaves.
 - Public API for other mods (`PocketsApi`): read pockets, store and remove events, a cancelable death event and a way to require the slot value.
+- Turning the mod off drops whatever is in your pockets (side by side in front of you); taking valuables out always works, only storing needs the mod enabled.
 - Tier 1 and Tier 2 tests, and developer-only tools (spike hotkeys and an icon baker) that are off by default.

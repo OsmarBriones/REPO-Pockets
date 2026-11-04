@@ -11,7 +11,8 @@ internal static class InventorySpot_Occupied_Patch
 	[HarmonyPostfix]
 	private static void Postfix(InventorySpot __instance, ref bool __result)
 	{
-		if (__result || !ConfigurationController.IsEnabled || !SemiFunc.RunIsLevel())
+		// Not gated by Enabled: a valuable that is still in a pocket keeps its slot until it is taken out.
+		if (__result || !SemiFunc.RunIsLevel())
 		{
 			return;
 		}

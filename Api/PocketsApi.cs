@@ -100,7 +100,7 @@ public static class PocketsApi
 		}
 
 		Vector3 position = at ?? DefaultDropPosition(playerKey, pocketed);
-		pocketed.BroadcastRelease(slot, playerKey, position, Quaternion.identity);
+		pocketed.BroadcastRelease(slot, playerKey, position, Quaternion.identity, false);
 		return true;
 	}
 

@@ -42,7 +42,8 @@ namespace Pockets
 		{
 			ConfigFile = config;
 
-			Enabled = ConfigFile.Bind("General", nameof(Enabled), true, "Enable or disable this mod.");
+			Enabled = ConfigFile.Bind("General", nameof(Enabled), true, "Enable or disable this mod. Turning it off drops whatever is in your pockets.");
+			Enabled.SettingChanged += (_, _) => OnEnabledChanged();
 			MaxValuableSizeEntry = ConfigFile.Bind("General", "MaxValuableSize", PocketSize.Tiny,
 				"Largest valuable that can be stored in a pocket. Every size up to this one is accepted (Tiny, Small, Medium, Big, Wide, Tall, VeryTall). The host's value is used.");
 			DropOnDeathEntry = ConfigFile.Bind("General", "DropOnDeath", true,
@@ -56,6 +57,15 @@ namespace Pockets
 				"Developer only. Press F10 inside a level to render a picture of every valuable to BepInEx/PocketIcons.");
 
 			ConfigFile.Save();
+		}
+
+		private static void OnEnabledChanged()
+		{
+			// Switching the mod off must not strand valuables in hidden pockets.
+			if (!IsEnabled)
+			{
+				PocketReleaser.ReleaseLocalPockets();
+			}
 		}
 
 		internal static void Reload()
