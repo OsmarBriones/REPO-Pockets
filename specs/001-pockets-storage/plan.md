@@ -133,6 +133,7 @@ Against `external/RepoKit/references/known-pitfalls.md`.
 | P-003 Singleplayer view ids are 0 | Yes | `PocketedValuable.Key` uses the view id only in multiplayer and the Unity instance id in singleplayer; unit tests accept 0 and negative keys. |
 | P-004 A running game locks the deployed DLL | Yes (workflow) | Close the game before building and compare the deployed DLL with the build output before asking for an in-game test. |
 | P-005 Hidden objects and extraction rooms | Yes | Haul list entry removed on store, `AddToDollarHaulList` guarded, store refused when `committedToExtraction`; confirmed with the spike tools (research S5). |
+| P-006 Hard-coded game content lists go stale | Yes | Icons are keyed by prefab name and loaded on demand with a runtime-render and generic fallback; the baker covers every prefab in the game's resources, so new valuables are picked up by re-running it. Effects for new valuables belong to the talisman table, not to Pockets. |
 
 ## Constitution Check
 

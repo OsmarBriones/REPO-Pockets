@@ -79,3 +79,17 @@ Decision: _pending_ (buffered RPC vs player custom properties)
 ## Other findings
 
 - **Singleplayer view ids:** every valuable reports `PhotonView.ViewID = 0` in singleplayer (seen for Museum Tooth, Museum Fish and Wizard Bird Skull), while in a multiplayer lobby they have real ids (for example 92). The pocket layer therefore identifies a valuable by an opaque key supplied by the integration layer (view id in multiplayer, `GetInstanceID()` in singleplayer); the pure `PocketState` only requires it to differ from `NoValuable`.
+
+## Pitfall candidates
+
+Noted as they happened, with the verdict of the filter in `external/RepoKit/references/known-pitfalls.md`.
+
+| Candidate | Verdict |
+|-----------|---------|
+| Singleplayer view ids are all 0 (found while reading logs, would have mixed valuables up) | Added as P-003 |
+| A running game blocks the DLL copy, so tests used stale code | Added as P-004 |
+| A hidden valuable inside an extraction room can reach the haul list | Added as P-005 |
+| The Sunstone update added 6 Tiny valuables that the concept's 29-item table did not know | Added as P-006 |
+| Unity's `ImageConversion.LoadImage` overloads need `ReadOnlySpan` on net48, and the image module needs netstandard 2.1 | Skip: the compiler reports it immediately, and the fix is in the project file |
+| The value label wrapped onto two lines in a narrow text box | Skip: cosmetic, caught on first sight |
+| Runtime-added `[PunRPC]` components need `RefreshRpcMonoBehaviourCache` | Skip for now: the call works (research S3), but missing it was never observed to fail, so the cause is unverified |
