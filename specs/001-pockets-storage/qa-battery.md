@@ -17,7 +17,7 @@ Generated from `spec.md`, `plan.md`, `ARCHITECTURE.md`, the configuration and th
 ### A. Baseline (mod off)
 - [ ] Set `Enabled = false`. Hold a valuable and press a slot key: nothing happens, and equipping and unequipping items works as vanilla.
 
-- [ ] Known pitfall P-007: with valuables in two or three slots, set `Enabled = false` (in the config menu, or edit the file and change level): the valuables drop side by side in front of you (not in your hands), the slots read as free, and a vanilla item can be equipped in them. Then set `Enabled = true` again and store one: it works.
+- [x] Known pitfall P-007 (log-confirmed 2026-11-04): with valuables in two or three slots, set `Enabled = false` (in the config menu, or edit the file and change level): the valuables drop side by side in front of you (not in your hands), the slots read as free, and a vanilla item can be equipped in them. Then set `Enabled = true` again and store one: it works.
 
 ### B. Happy path (singleplayer is enough)
 - [x] Store a Tiny valuable in each of the three slots (log: `Stored ... in slot N`).
