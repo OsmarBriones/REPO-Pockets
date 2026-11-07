@@ -3,7 +3,8 @@
 ## [Unreleased]
 
 ### Fixed
-- A slot whose valuable was destroyed while pocketed no longer stays stuck: pressing its key frees it.
+- A valuable destroyed while pocketed (for example worn out by a charm) now frees its slot properly: the slot stops showing its picture and value, and other mods are told it left.
+- A slot whose valuable no longer exists is freed when you press its key instead of staying stuck.
 
 ## [1.0.0] - 2026-11-06
 - Store a held valuable in a free inventory slot with the slot key, and take it out with the same key (it ends up in your hands).

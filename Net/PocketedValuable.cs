@@ -65,9 +65,26 @@ internal sealed class PocketedValuable : MonoBehaviourPun
 
 	private void OnDestroy()
 	{
-		if (IsPocketed)
+		if (!IsPocketed)
 		{
-			PocketsApi.Forget(PlayerKey, Slot);
+			return;
+		}
+
+		// The valuable was destroyed while pocketed (worn out, broken by another mod). Free the slot, and tell everybody
+		// who needs to know: the slot must stop drawing the old picture and listeners must see the valuable leave.
+		int playerKey = PlayerKey;
+		int slot = Slot;
+		int valuableKey = Key;
+		PocketsApi.Forget(playerKey, slot);
+		try
+		{
+			PocketsApi.RaiseRemoved(new PocketEvent(playerKey, slot, valuableKey, null));
+			RefreshLocalSlot(playerKey, slot);
+		}
+		catch (System.Exception exception)
+		{
+			// Destruction also happens while a scene unloads, when the inventory may already be gone.
+			PocketsPlugin.Logger.LogWarning($"Could not refresh slot {slot} after {name} was destroyed: {exception.Message}");
 		}
 	}
 
