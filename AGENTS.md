@@ -13,7 +13,7 @@ for .NET Framework 4.8.
   a running game locks the DLL and the copy fails (known pitfall P-004). Debug and Release
   both deploy, so the last build wins.
 - Tests: `dotnet test Pockets.Tests/Pockets.Tests.csproj` (Tier 1 logic and Tier 2 game contract).
-- Developer-only tools, off by default: `Debug.EnableSpikes` (hotkeys F6-F9) and `Debug.EnableIconBake` (F10).
+- Developer-only tool, off by default: `Debug.EnableIconBake` (F10 renders every valuable to `BepInEx/PocketIcons`).
 - Configuration and paths:
   - Game paths and target framework are configured in `Directory.Build.props`.
   - Override the default Steam path if needed with the `REPO_GAME_DIR` environment variable.

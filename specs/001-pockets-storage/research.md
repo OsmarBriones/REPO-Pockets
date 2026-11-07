@@ -94,3 +94,15 @@ Noted as they happened, with the verdict of the filter in `external/RepoKit/refe
 | Unity's `ImageConversion.LoadImage` overloads need `ReadOnlySpan` on net48, and the image module needs netstandard 2.1 | Skip: the compiler reports it immediately, and the fix is in the project file |
 | The value label wrapped onto two lines in a narrow text box | Skip: cosmetic, caught on first sight |
 | Runtime-added `[PunRPC]` components need `RefreshRpcMonoBehaviourCache` | Skip for now: the call works (research S3), but missing it was never observed to fail, so the cause is unverified |
+
+## Multiplayer results (2026-11-06, two real machines: host on the developer machine, client on a second PC)
+
+Both BepInEx logs were read. Evidence from the logs:
+
+- **S3 confirmed (RPC to a remote client):** a store made on the host appears in the client's log (`Stored ... player 1010`) with no key press there, and a store made on the client appears in the host's log (`Stored ... player 2010`) with no key press there. The request goes to the master, the master broadcasts, and both machines apply it. The same valuables were stored in the same slots on both sides.
+- **S4 (hidden physics on the client):** the developer reported that valuables stored by the host looked and behaved correctly on the client (hidden, not drifting or falling); the logs carry no measurement, so this rests on that observation.
+- **Disconnect:** when the client left the room, the host logged `Released` for both of the client's valuables (slots 0 and 1) just before `Player left room`, so the host drops a leaver's valuables where they were hidden.
+- **S2 (late join):** not tested. The design does not rely on player properties: the master resends the store RPC to a player who joins (`PocketsRoomEvents.OnPlayerEnteredRoom`), and the host's settings travel as room properties. The player-property prototype is obsolete and was removed with the rest of the spike code.
+- No exceptions, null references or refusals in either log. All icons were packaged. The helper mods synced to the second PC (REPOLib, MenuLib, REPOConfig, RepoAdminMenu, Enemy Health Display, StealLifeFromMonsters) loaded there; the two disabled ones did not.
+
+Still not covered by logs: the client taking a valuable out with its own key, late join, the client changing its own settings, and the client dying.

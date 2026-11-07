@@ -12,7 +12,6 @@ namespace Pockets
 		private static ConfigEntry<PocketSize>? MaxValuableSizeEntry { get; set; }
 		private static ConfigEntry<bool>? DropOnDeathEntry { get; set; }
 		private static ConfigEntry<bool>? ShowSlotValueEntry { get; set; }
-		private static ConfigEntry<bool>? EnableSpikes { get; set; }
 		private static ConfigEntry<bool>? EnableIconBake { get; set; }
 
 		internal static bool IsEnabled => Enabled?.Value ?? true;
@@ -32,9 +31,6 @@ namespace Pockets
 		/// <summary>Whether the slot shows the stored valuable's value: the player's setting, forced on while a mod such as TalismanCore requires it. Local only.</summary>
 		internal static bool ShowSlotValue => (ShowSlotValueEntry?.Value ?? true) || PocketsApi.SlotValueRequired;
 
-		/// <summary>Opt-in prototype hotkeys for the technical spikes in plan.md. Disabled by default.</summary>
-		internal static bool SpikesEnabled => EnableSpikes?.Value ?? false;
-
 		/// <summary>Opt-in developer tool: F10 renders every valuable prefab to a PNG in BepInEx/PocketIcons. Disabled by default.</summary>
 		internal static bool IconBakeEnabled => EnableIconBake?.Value ?? false;
 
@@ -50,9 +46,6 @@ namespace Pockets
 				"Drop the valuables stored in your pockets where you die. The host's value is used.");
 			ShowSlotValueEntry = ConfigFile.Bind("Display", "ShowSlotValue", true,
 				"Show the stored valuable's current value on its inventory slot. Mods that depend on the value (the talismans) turn it on regardless of this setting.");
-			EnableSpikes = ConfigFile.Bind("Debug", nameof(EnableSpikes), false,
-				"Developer only. Enables prototype hotkeys (F6 hide or show the held valuable, F7 dump its state, F8 sync test, F9 host property test).");
-
 			EnableIconBake = ConfigFile.Bind("Debug", nameof(EnableIconBake), false,
 				"Developer only. Press F10 inside a level to render a picture of every valuable to BepInEx/PocketIcons.");
 

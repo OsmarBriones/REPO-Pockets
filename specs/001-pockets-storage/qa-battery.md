@@ -41,12 +41,13 @@ Generated from `spec.md`, `plan.md`, `ARCHITECTURE.md`, the configuration and th
 - [x] Die with valuables in your pockets (`DropOnDeath = true`): they drop where you fell and can be picked up.
 - [ ] Drop a valuable into a death pit, a cart or the extraction machine, then try to store another: no errors.
 
-### E. Multiplayer (needs a second player; closes spikes S2, S3, S4)
-- [ ] Host and client both have the mod. The client stores a valuable: it disappears for the host too, and the host cannot grab it.
-- [ ] The host stores one: the client sees it disappear, and it does not drift or fall (hidden physics, spike S4).
+### E. Multiplayer (needs a second player)
+Verified 2026-11-06 with two real machines (see `research.md`): the three checked items below. Still open: taking out from the client, settings applied from the host, late join, and the client dying.
+- [x] Host and client both have the mod. The client stores a valuable: it disappears for the host too, and the host cannot grab it.
+- [x] The host stores one: the client sees it disappear, and it does not drift or fall (hidden physics, spike S4).
 - [ ] The client takes it out: it appears for both in front of the client's camera, and the client holds it.
 - [ ] The client changes `MaxValuableSize`/`DropOnDeath` locally: the host's values still apply.
-- [ ] The client disconnects with a valuable pocketed: it drops where it was hidden.
+- [x] The client disconnects with a valuable pocketed: it drops where it was hidden.
 - [ ] A player joins after another has valuables pocketed: they see them hidden (spike S2).
 - [ ] The client dies with valuables: they drop where the client fell.
 

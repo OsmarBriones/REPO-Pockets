@@ -1,7 +1,6 @@
 using BepInEx;
 using HarmonyLib;
 using Pockets.Net;
-using Pockets.Spikes;
 using UnityEngine;
 
 namespace Pockets
@@ -27,12 +26,6 @@ namespace Pockets
 			ConfigurationController.Initialize(this.Config);
 
 			this.gameObject.AddComponent<PocketsRoomEvents>();
-
-			if (ConfigurationController.SpikesEnabled)
-			{
-				this.gameObject.AddComponent<SpikeHotkeys>();
-				Logger.LogWarning("Spike hotkeys are enabled (Debug.EnableSpikes). Developer use only.");
-			}
 
 			if (ConfigurationController.IconBakeEnabled)
 			{

@@ -25,7 +25,6 @@ Why a parallel layer: the vanilla inventory only accepts `ItemEquippable` items;
 | `Ui/` | `PocketSlotView` (picture and value on the slot), `ValuableIconRenderer` (packaged or rendered icons), `IconBaker` (developer tool). |
 | `Api/` | The public surface for other mods: `PocketsApi`, `PocketEvent`, `PlayerDyingEventArgs`, plus the internal `PlayerPockets` registry. |
 | `Patches/` | Thin Harmony patches that delegate to the layers above. |
-| `Spikes/` | Opt-in developer prototypes (hotkeys F6-F9) kept until the multiplayer spikes in `research.md` are closed. |
 
 ---
 
@@ -76,7 +75,7 @@ Valuables have no vanilla icon. `ValuableIconRenderer` resolves, in order: a PNG
 
 ## Known gaps
 
-- Multiplayer behavior (host and client, late join, who simulates a hidden Tiny/Small valuable) is implemented but only verified in singleplayer and a lobby hosted alone; spikes S2, S3 and S4 stay open in `research.md`.
+- Multiplayer was verified with two real machines (host and client): stores by either side appear on the other, and the host releases a leaver's valuables where they were hidden. Not yet verified with two machines: taking a valuable out from the client, late join, the client changing its own settings, and the client dying.
 - A valuable held by a monster is not specifically detected; the host only checks that the requesting player is the only grabber.
 - Resending the stored state to a late joiner assumes the joiner already has the valuables loaded.
 

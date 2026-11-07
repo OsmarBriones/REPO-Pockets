@@ -29,11 +29,11 @@ description: "Task list for the Pockets storage feature"
 **Purpose**: Resolve the five risks in `plan.md` with throwaway prototypes behind an opt-in debug config (disabled by default)
 
 - [x] T005 S1 (confirmed in singleplayer, see research.md): prototype hiding a Tiny valuable (shrink, colliders off, `OverrideDeactivate`, release grabbers) and restoring it in front of the camera; log rigidbody, room and haul-list state
-- [ ] T006 S3 (code written in Spikes/, needs host and client): prove a runtime-added `MonoBehaviour` with `[PunRPC]` plus `RefreshRpcMonoBehaviourCache` works on a scene-spawned valuable on host and client; if not, switch to `PhotonNetwork.RaiseEvent` with a custom event code
-- [ ] T007 S4 (code written in Spikes/, needs host and client): check who simulates a hidden Tiny/Small valuable (`clientNonKinematic`) and that forcing kinematic on store and restoring on release is stable on a client
+- [x] T006 (confirmed with two real machines) S3 (code written in Spikes/, needs host and client): prove a runtime-added `MonoBehaviour` with `[PunRPC]` plus `RefreshRpcMonoBehaviourCache` works on a scene-spawned valuable on host and client; if not, switch to `PhotonNetwork.RaiseEvent` with a custom event code
+- [x] T007 (reported fine by the tester, no measurement) S4 (code written in Spikes/, needs host and client): check who simulates a hidden Tiny/Small valuable (`clientNonKinematic`) and that forcing kinematic on store and restoring on release is stable on a client
 - [x] T008 S5 (confirmed, see research.md): verify a pocketed valuable inside an extraction room is not added to `RoundDirector.dollarHaulList` and that nothing iterating valuables throws
-- [ ] T009 S2 (code written in Spikes/, needs three instances): decide late-join sync (Photon player custom properties vs buffered RPC) and whether the master can write another player's state
-- [ ] T010 Record the outcomes in `specs/001-pockets-storage/research.md` and update `plan.md` where a spike changed the design
+- [x] T009 (decided: master resends the store RPC to a joiner; late join itself untested) S2 (code written in Spikes/, needs three instances): decide late-join sync (Photon player custom properties vs buffered RPC) and whether the master can write another player's state
+- [x] T010 (recorded in research.md; spike code removed) Record the outcomes in `specs/001-pockets-storage/research.md` and update `plan.md` where a spike changed the design
 
 ---
 
