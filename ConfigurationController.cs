@@ -45,7 +45,7 @@ namespace Pockets
 			DropOnDeathEntry = ConfigFile.Bind("General", "DropOnDeath", true,
 				"Drop the valuables stored in your pockets where you die. The host's value is used.");
 			ShowSlotValueEntry = ConfigFile.Bind("Display", "ShowSlotValue", true,
-				"Show the stored valuable's current value on its inventory slot. Mods that depend on the value (the charms) turn it on regardless of this setting.");
+				"Show the stored valuable's current value on its inventory slot. Other mods that depend on the value turn it on regardless of this setting.");
 			EnableIconBake = ConfigFile.Bind("Debug", nameof(EnableIconBake), false,
 				"Developer only. Press F10 inside a level to render a picture of every valuable to BepInEx/PocketIcons.");
 

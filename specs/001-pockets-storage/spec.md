@@ -2,7 +2,7 @@
 
 **Feature Branch**: `001-pockets-storage`
 **Status**: Draft
-**Source concept**: `sandbox/PocketCharms_spec.md` (layer 1 of 4 in the PocketCharms family)
+**Source concept**: `sandbox/PocketCharms_spec.md` (Pockets is a standalone mod; other mods, such as CharmCore, depend on it)
 
 ## Summary
 
