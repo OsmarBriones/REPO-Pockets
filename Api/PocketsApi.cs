@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Pockets.Api;
 
 /// <summary>
-/// Public surface of Pockets for other mods (TalismanCore). Read the pockets of any player and
+/// Public surface of Pockets for other mods (CharmCore). Read the pockets of any player and
 /// react to valuables being stored or removed. All members are safe to call from the main thread only.
 /// </summary>
 public static class PocketsApi
@@ -26,7 +26,7 @@ public static class PocketsApi
 
 	/// <summary>
 	/// Makes the stored valuable's value always visible on the slot, overriding the player's <c>ShowSlotValue</c> setting.
-	/// Mods that give meaning to the value (TalismanCore) call this once at startup with their own id.
+	/// Mods that give meaning to the value (CharmCore) call this once at startup with their own id.
 	/// </summary>
 	public static void RequireSlotValue(string requesterId)
 	{

@@ -6,7 +6,7 @@ namespace Pockets.Patches;
 
 /// <summary>
 /// When a player dies (accepted by vanilla), the master gives subscribers a chance to take over the stored valuables
-/// (the Phone talisman moves them to a cart), and otherwise drops them where the player fell if <c>DropOnDeath</c> is on.
+/// (the Phone charm moves them to a cart), and otherwise drops them where the player fell if <c>DropOnDeath</c> is on.
 /// </summary>
 [HarmonyPatch(typeof(PlayerAvatar), nameof(PlayerAvatar.PlayerDeathRPC))]
 internal static class PlayerAvatar_PlayerDeathRPC_Patch

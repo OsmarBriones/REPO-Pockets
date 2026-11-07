@@ -2,12 +2,12 @@
 
 **Feature Branch**: `001-pockets-storage`
 **Status**: Draft
-**Source concept**: `sandbox/PocketTalismans_spec.md` (layer 1 of 4 in the PocketTalismans family)
+**Source concept**: `sandbox/PocketCharms_spec.md` (layer 1 of 4 in the PocketCharms family)
 
 ## Summary
 
 Pockets is a standalone mod that lets a player store a held valuable in a free inventory slot and take it out again.
-It is useful on its own and is the base dependency of TalismanCore. It knows nothing about effects or wear.
+It is useful on its own and is the base dependency of CharmCore. It knows nothing about effects or wear.
 
 ## User Scenarios & Testing
 
@@ -44,7 +44,7 @@ As a player, I want to configure the largest storable size (default Tiny, up to 
 - **FR-003**: Stored valuables are removed from the world and cannot count toward the haul until taken out.
 - **FR-004**: Stored valuables are lost on level change.
 - **FR-005**: On death, stored valuables are dropped where the player fell (`DropOnDeath`, default true).
-- **FR-006**: The mod exposes events for stored and removed valuables for other mods (consumed by TalismanCore).
+- **FR-006**: The mod exposes events for stored and removed valuables for other mods (consumed by CharmCore).
 - **FR-007**: Multiplayer scope is Category 2: all players install the mod. A player without it would lose functional things, not cosmetic ones (cannot store or release a valuable, cannot see which slot is occupied, and could try to equip items into a slot that holds a pocket), so the minimum install footprint rule does not allow a lighter scope.
 - **FR-008**: Config file `BepInEx/config/com.osmar.Pockets.cfg` with `Enabled`, `MaxValuableSize`, `DropOnDeath`.
 

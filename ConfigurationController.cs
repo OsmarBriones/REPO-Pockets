@@ -28,7 +28,7 @@ namespace Pockets
 		/// <summary>Whether stored valuables drop where the player dies. Clients use the host's value.</summary>
 		internal static bool DropOnDeath => HostSettings.TryGetDropOnDeath(out bool hostDrop) ? hostDrop : LocalDropOnDeath;
 
-		/// <summary>Whether the slot shows the stored valuable's value: the player's setting, forced on while a mod such as TalismanCore requires it. Local only.</summary>
+		/// <summary>Whether the slot shows the stored valuable's value: the player's setting, forced on while a mod such as CharmCore requires it. Local only.</summary>
 		internal static bool ShowSlotValue => (ShowSlotValueEntry?.Value ?? true) || PocketsApi.SlotValueRequired;
 
 		/// <summary>Opt-in developer tool: F10 renders every valuable prefab to a PNG in BepInEx/PocketIcons. Disabled by default.</summary>
@@ -45,7 +45,7 @@ namespace Pockets
 			DropOnDeathEntry = ConfigFile.Bind("General", "DropOnDeath", true,
 				"Drop the valuables stored in your pockets where you die. The host's value is used.");
 			ShowSlotValueEntry = ConfigFile.Bind("Display", "ShowSlotValue", true,
-				"Show the stored valuable's current value on its inventory slot. Mods that depend on the value (the talismans) turn it on regardless of this setting.");
+				"Show the stored valuable's current value on its inventory slot. Mods that depend on the value (the charms) turn it on regardless of this setting.");
 			EnableIconBake = ConfigFile.Bind("Debug", nameof(EnableIconBake), false,
 				"Developer only. Press F10 inside a level to render a picture of every valuable to BepInEx/PocketIcons.");
 

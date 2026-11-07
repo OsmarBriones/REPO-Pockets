@@ -46,7 +46,7 @@ Why a parallel layer: the vanilla inventory only accepts `ItemEquippable` items;
 - `Enabled` is only a gate for storing. When it turns off (config menu or reload), `PocketReleaser` drops the local player's stored valuables side by side in front of them (not grabbed), through the normal release path, so nothing is left hidden. Taking out, the occupied-slot display and the slot picture keep working regardless, as a safety net.
 
 ### Death, disconnect, level change
-- **Death:** after vanilla accepts `PlayerDeathRPC`, the master raises `PocketsApi.PlayerDying`. A subscriber can cancel it to handle the valuables itself (the Phone talisman); otherwise, with `DropOnDeath`, they are released where the player fell.
+- **Death:** after vanilla accepts `PlayerDeathRPC`, the master raises `PocketsApi.PlayerDying`. A subscriber can cancel it to handle the valuables itself (the Phone charm); otherwise, with `DropOnDeath`, they are released where the player fell.
 - **Disconnect:** the master releases the leaver's valuables where they were hidden.
 - **Late join:** the master resends the stored state to the new player (`SendStateTo`).
 - **Level change:** `EnemyDirector.Start` clears the registry. Valuables are scene objects, so nothing persists.
@@ -55,7 +55,7 @@ Why a parallel layer: the vanilla inventory only accepts `ItemEquippable` items;
 
 ## Settings (`com.osmar.Pockets.cfg`)
 
-`MaxValuableSize` and `DropOnDeath` belong to the host: it publishes them as room properties on level start, on join and when the master changes, and clients read them on demand (`HostSettings`). `ShowSlotValue` is local; `PocketsApi.RequireSlotValue` lets a dependent mod (TalismanCore) force it on. `Debug.EnableSpikes` and `Debug.EnableIconBake` are developer-only and off by default.
+`MaxValuableSize` and `DropOnDeath` belong to the host: it publishes them as room properties on level start, on join and when the master changes, and clients read them on demand (`HostSettings`). `ShowSlotValue` is local; `PocketsApi.RequireSlotValue` lets a dependent mod (CharmCore) force it on. `Debug.EnableSpikes` and `Debug.EnableIconBake` are developer-only and off by default.
 
 ---
 

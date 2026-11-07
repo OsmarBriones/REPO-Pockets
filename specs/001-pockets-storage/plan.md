@@ -13,7 +13,7 @@ The vanilla inventory only accepts `ItemEquippable` items, and valuables are not
 - A per-valuable runtime component carries the store and release RPCs and hides the object with the same technique the game uses for equipped items (shrink, colliders off, grab released).
 - Harmony patches on `InventorySpot` make a pocketed slot read as occupied, intercept the slot key, and draw the pocket on the slot.
 - The host validates every request (size policy, free slot, ownership) and broadcasts the result, mirroring `ItemEquippable.RPC_RequestEquip`.
-- A small public API (events and queries) lets `TalismanCore` consume the pockets without knowing how they are stored.
+- A small public API (events and queries) lets `CharmCore` consume the pockets without knowing how they are stored.
 
 Multiplayer scope is Category 2: every player installs the mod.
 
@@ -27,7 +27,7 @@ Multiplayer scope is Category 2: every player installs the mod.
 - Photon PUN 2 (`PhotonView`, `PunRPC`, custom properties)
 - `RepoAPI`: not needed (see RepoAPI reuse decision)
 **Target Platform**: Windows 64-bit / R.E.P.O.
-**Project Type**: BepInEx game mod (`Pockets.dll`), also a **referenced dependency** of `TalismanCore`
+**Project Type**: BepInEx game mod (`Pockets.dll`), also a **referenced dependency** of `CharmCore`
 **Performance Goals**: No per-frame allocations; no `FindObjectsOfType` in `Update`; the slot value text updates at most a few times per second.
 **Constraints**:
 - Strict modern C# (§6): no `_`/`s_` prefixes, `internal` by default; only the plugin class and the API surface are `public`.
@@ -46,7 +46,7 @@ Multiplayer scope is Category 2: every player installs the mod.
 | Hiding technique | `ItemEquippable.AnimateEquip`: shrink to 0.01 scale, `collider.enabled = false`, `physGrabObject.OverrideDeactivate()`; released grabbers via `PhysGrabber.OverrideGrabRelease(viewId)`. `AnimateUnequip` restores scale, colliders, mass and teleports in front of the camera (`RayHitTestNew`). | Reuse the same steps on the valuable. |
 | Valuable | `ValuableObject` has `volumeType` (Tiny, Small, Medium, Big, Wide, Tall, VeryTall), `dollarValueOriginal/Current`. Tiny and Small set `physGrabObject.clientNonKinematic = true`. | Size policy reads `volumeType`; physics ownership of Tiny/Small needs a spike. |
 | **Haul leak** | `ValuableObject.Update` (master) adds the object to `RoundDirector.dollarHaulList` when any of `roomVolumeCheck.CurrentRooms` is an Extraction room. A hidden valuable left inside an extraction room would be extracted. | Patch private `AddToDollarHaulList` to skip pocketed objects; remove from the list on store; refuse to store when `committedToExtraction`. |
-| Death | `PlayerAvatar.PlayerDeath(int)` / `PlayerDeathRPC` is the death entry point. | Drop pockets there, after raising a cancelable event for `TalismanCore` (Phone rescue). |
+| Death | `PlayerAvatar.PlayerDeath(int)` / `PlayerDeathRPC` is the death entry point. | Drop pockets there, after raising a cancelable event for `CharmCore` (Phone rescue). |
 | RPC on runtime components | PUN finds RPC methods on `MonoBehaviour`s of the object that has the `PhotonView`; the cache must be refreshed after adding a component (`PhotonView.RefreshRpcMonoBehaviourCache`). | Add the component at runtime on every client and refresh. Needs a spike (see S2). |
 
 ## Architecture & Data Flow
@@ -82,7 +82,7 @@ State per player: `PocketState` is a plain class (no Unity types) with 3 entries
 
 Exact signatures are confirmed in Tier 2 reflection tests; if a target changes with a game update the contract test fails with a clear message.
 
-## Public API (consumed by TalismanCore)
+## Public API (consumed by CharmCore)
 
 `Pockets.Api.PocketsApi` (public, no Unity-game types beyond `ValuableObject`):
 
@@ -92,7 +92,7 @@ Exact signatures are confirmed in Tier 2 reflection tests; if a target changes w
 - `bool IsPocketed(ValuableObject valuable)`
 - `bool TryRemove(int playerViewId, int spot, Vector3? at)` (used by Phone)
 
-`Pockets.dll` ships as a real DLL referenced by `TalismanCore` (not source-included), as decided for the family.
+`Pockets.dll` ships as a real DLL referenced by `CharmCore` (not source-included), as decided for the family.
 
 ## Configuration (`BepInEx/config/com.osmar.Pockets.cfg`)
 
@@ -134,7 +134,7 @@ Against `external/RepoKit/references/known-pitfalls.md`.
 | P-004 A running game can keep the old DLL | Yes (workflow) | Close the game before building, restart it after, and compare the deployed DLL hash with the build output before asking for an in-game test. |
 | P-005 Hidden objects and extraction rooms | Yes | Haul list entry removed on store, `AddToDollarHaulList` guarded, store refused when `committedToExtraction`; confirmed with the spike tools (research S5). |
 | P-007 Switching a mod off strands its state | Yes | Switching `Enabled` off releases the local player's pockets (`PocketReleaser`, on `SettingChanged`); taking a valuable out, the occupied-slot display and the slot picture are not gated by `Enabled`, only storing is. |
-| P-006 Hard-coded game content lists go stale | Yes | Icons are keyed by prefab name and loaded on demand with a runtime-render and generic fallback; the baker covers every prefab in the game's resources, so new valuables are picked up by re-running it. Effects for new valuables belong to the talisman table, not to Pockets. |
+| P-006 Hard-coded game content lists go stale | Yes | Icons are keyed by prefab name and loaded on demand with a runtime-render and generic fallback; the baker covers every prefab in the game's resources, so new valuables are picked up by re-running it. Effects for new valuables belong to the charm table, not to Pockets. |
 
 ## Constitution Check
 
@@ -168,7 +168,7 @@ REPO-Pockets/
 │   ├── PocketedValuable.cs             # runtime component: RPCs + hide/show
 │   └── PocketSync.cs                   # request/validate/broadcast, late join
 ├── Ui/PocketSlotView.cs                # icon sprite + value text on InventorySpot
-├── Api/PocketsApi.cs                   # public surface for TalismanCore
+├── Api/PocketsApi.cs                   # public surface for CharmCore
 ├── Patches/
 │   ├── InventorySpot_HandleInput_Patch.cs
 │   ├── InventorySpot_Occupied_Patch.cs
