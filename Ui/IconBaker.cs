@@ -9,7 +9,7 @@ namespace Pockets.Ui;
 /// <summary>
 /// Developer-only tool (Debug.EnableIconBake). Press F10 inside a level to render a picture of every valuable
 /// prefab in the game with the same studio lighting and save them as PNG files in BepInEx/PocketIcons.
-/// The PNGs are then copied into the repository's Assets/Icons folder and packaged inside the mod.
+/// The PNGs are then copied into the repository's assets/Icons folder and packaged inside the mod.
 /// </summary>
 internal sealed class IconBaker : MonoBehaviour
 {

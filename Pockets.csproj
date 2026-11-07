@@ -45,9 +45,9 @@
     -->
   </ItemGroup>
 
-  <!-- Packaged valuable icons (baked with the IconBaker tool): Assets/Icons/<Valuable Name>.png -->
+  <!-- Packaged valuable icons (baked with the IconBaker tool): assets/Icons/<Valuable Name>.png -->
   <ItemGroup>
-    <EmbeddedResource Include="Assets\Icons\*.png" LogicalName="Pockets.Icons.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="assets\Icons\*.png" LogicalName="Pockets.Icons.%(Filename)%(Extension)" />
   </ItemGroup>
 
   <!-- Game and Unity References -->

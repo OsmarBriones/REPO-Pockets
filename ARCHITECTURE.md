@@ -61,7 +61,7 @@ Why a parallel layer: the vanilla inventory only accepts `ItemEquippable` items;
 
 ## Icons
 
-Valuables have no vanilla icon. `ValuableIconRenderer` resolves, in order: a PNG packaged in the DLL (`Assets/Icons/<Valuable Name>.png`, `Pockets.Icons.*` resources), a picture rendered at runtime with a throwaway camera and studio lighting, or a generic gem. `IconBaker` (F10, developer tool) renders every valuable prefab to `BepInEx/PocketIcons`; the PNGs are cropped and copied into `Assets/Icons`. Re-run it after a game update adds valuables.
+Valuables have no vanilla icon. `ValuableIconRenderer` resolves, in order: a PNG packaged in the DLL (`assets/Icons/<Valuable Name>.png`, `Pockets.Icons.*` resources), a picture rendered at runtime with a throwaway camera and studio lighting, or a generic gem. `IconBaker` (F10, developer tool) renders every valuable prefab to `BepInEx/PocketIcons`; the PNGs are cropped and copied into `Assets/Icons`. Re-run it after a game update adds valuables.
 
 ---
 

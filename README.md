@@ -22,7 +22,7 @@ Keep valuables in your inventory slots and take them out again whenever you want
 - **A picture of each valuable:** every valuable has its own little image on the slot, plus its current value (you can turn the value off).
 - **Fair to extraction:** a valuable in your pocket does not count toward the haul until you take it out and deliver it.
 - **Nothing carries over:** valuables in your pockets are lost when the level ends.
-- **If you die or leave:** your pocketed valuables drop where you fell or where you left.
+- **If you die or leave:** your pocketed valuables drop where you fell or where you left. Switching the mod off drops them too, so nothing gets stuck.
 - **Choose what fits:** by default only the smallest valuables fit; the host can allow bigger ones.
 
 ## Requirements
@@ -36,7 +36,7 @@ Keep valuables in your inventory slots and take them out again whenever you want
 ## Configuration
 All settings are in `com.osmar.Pockets.cfg` inside `BepInEx/config`.
 
-- `Enabled` (default `true`): turn the mod on or off.
+- `Enabled` (default `true`): turn the mod on or off. Turning it off drops whatever is in your pockets.
 - `MaxValuableSize` (default `Tiny`): the biggest valuable that fits in a pocket. Every smaller size fits too (Tiny, Small, Medium, Big, Wide, Tall, VeryTall). The host's choice applies to everyone.
 - `DropOnDeath` (default `true`): drop your pocketed valuables where you die. The host's choice applies to everyone.
 - `ShowSlotValue` (default `true`): show the stored valuable's value on its slot. Mods that depend on the value turn it on regardless.
