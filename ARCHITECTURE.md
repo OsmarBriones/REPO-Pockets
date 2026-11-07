@@ -47,6 +47,7 @@ Why a parallel layer: the vanilla inventory only accepts `ItemEquippable` items;
 
 ### Death, disconnect, level change
 - **Death:** after vanilla accepts `PlayerDeathRPC`, the master raises `PocketsApi.PlayerDying`. A subscriber can cancel it to handle the valuables itself (the Phone charm); otherwise, with `DropOnDeath`, they are released where the player fell.
+- **Destroyed while pocketed:** when the game or another mod destroys a pocketed valuable, `PocketedValuable.OnDestroy` frees the registry entry, raises `PocketsApi.Removed` with a null valuable and redraws the slot (guarded, since scenes also unload). A slot whose valuable no longer exists is also freed when its key is pressed, as a safety net (pitfall P-008).
 - **Disconnect:** the master releases the leaver's valuables where they were hidden.
 - **Late join:** the master resends the stored state to the new player (`SendStateTo`).
 - **Level change:** `EnemyDirector.Start` clears the registry. Valuables are scene objects, so nothing persists.
