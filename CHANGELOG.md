@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- A slot whose valuable was destroyed while pocketed no longer stays stuck: pressing its key frees it.
+
 ## [1.0.0] - 2026-11-06
 - Store a held valuable in a free inventory slot with the slot key, and take it out with the same key (it ends up in your hands).
 - A picture of each valuable (198 packaged icons) and its current value on the slot; `ShowSlotValue` turns the value off.

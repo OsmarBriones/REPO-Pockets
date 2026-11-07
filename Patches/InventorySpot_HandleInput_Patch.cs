@@ -44,6 +44,12 @@ internal static class InventorySpot_HandleInput_Patch
 				{
 					pocketed.RequestRelease();
 				}
+				else
+				{
+					// The valuable behind this slot no longer exists (destroyed while pocketed): free the slot instead of leaving it stuck.
+					PocketsPlugin.Logger.LogWarning($"Slot {spot + 1} held a valuable that no longer exists; freeing the slot.");
+					PocketsApi.Forget(playerKey, spot);
+				}
 			}
 
 			return false;
